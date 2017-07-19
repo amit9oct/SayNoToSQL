@@ -10,7 +10,7 @@ namespace SayNoToSQL.Controllers
     {
         public ActionResult Index()
         {
-            return View();
+            return View();//pranav is awesome!!
         }
 
         public ActionResult About()
