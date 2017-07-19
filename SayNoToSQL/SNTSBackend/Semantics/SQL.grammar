@@ -1,0 +1,14 @@
+﻿using System.Collections.Generic;
+using System.Data;
+
+using semantics ProseSample.Substrings.Semantics;
+using learners ProseSample.Substrings.WitnessFunctions;
+
+language SayNoToSql;
+
+@start DataTable sql := select;
+
+DataTable select := SelectWithoutWhere(columnList,tableList);
+
+@input DataTable[] tableArray;
+DataColumn[] columnArray;
