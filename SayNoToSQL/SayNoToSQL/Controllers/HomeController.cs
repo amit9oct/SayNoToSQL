@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using ystem.Linq;
 using System.Web;
 using System.Web.Mvc;
 
@@ -10,8 +10,6 @@ namespace SayNoToSQL.Controllers
     {
         public ActionResult Index()
         {
-            //pranav is awesome!!
-            //Sharon's comment
             return View();
         }
 
