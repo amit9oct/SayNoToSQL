@@ -10,15 +10,12 @@ namespace SayNoToSQL.Controllers
     {
         public ActionResult Index()
         {
-            //pranav is awesome!!
-            //Sharon's comment
             return View();
         }
 
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";
-            //trivialComment
             return View();
         }
 
