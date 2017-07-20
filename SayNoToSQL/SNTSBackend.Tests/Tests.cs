@@ -88,7 +88,7 @@ namespace SNTSBackend.Tests
         [TestMethod]
         public void SelectWithoutWhereSynthesisTest() {
             DataTable inputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithoutWhere-Input.csv");
-            DataTable outputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithoutWhere-Output.csv");
+            DataTable outputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithoutWhere-Output.csv", inputTable);
             var programNode = Learner.Instance.LearnSQL(inputTable, outputTable);
             DataTable outputLearnt = Learner.Instance.Invoke(programNode, inputTable);
             Debug.Assert(outputLearnt.Columns.Count == outputTable.Columns.Count);

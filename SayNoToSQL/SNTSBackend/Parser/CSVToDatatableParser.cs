@@ -60,8 +60,19 @@ namespace SNTSBackend.Parser
             {
                 foreach(DataRow inputRow in inputTable.Rows)
                 {
-                    
-                    if(row.ItemArray.Skip(1).SequenceEqual(inputRow.ItemArray.Skip(1)))
+                    Boolean isSame = true;
+                    foreach(DataColumn col in table.Columns)
+                    {
+                        var x = row[col.ColumnName];
+                        var y = inputRow[col.ColumnName];
+                        if((col.ColumnName != "PrimaryKey") 
+                            && (!(row[col.ColumnName].Equals(inputRow[col.ColumnName]))))
+                        {
+                            isSame = false;
+                        }
+
+                    }
+                    if(isSame)
                     {
                         row["PrimaryKey"] = inputRow["PrimaryKey"];
                     }
