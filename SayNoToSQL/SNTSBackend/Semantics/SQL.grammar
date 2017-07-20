@@ -8,7 +8,13 @@ language SayNoToSql;
 
 @start DataTable sql := select;
 
-DataTable select := SelectWithoutWhere(columnList,tableList);
+DataTable select := SelectWithoutWhere(columnList,tableList) | SelectWithWhere(columnList,condition);
+DataTable condition :=   cmpStatement  // This has one single the comparison statement 
+        |Logical(cmpStatement, @recurse[5] condition, logicSymbol); // combining two comparison statements 
+DataTable cmpStatement = Comparator(column, tableList, cmpSymbol, constValue); // column.name [cmpSymbol] Const
+string cmpSymbol := ‘>’|’<’|’>=’|’<=’|’==’; 
+string logicSymbol := ‘AND’|’OR’;
+
 
 @input DataTable[] tableArray;
 DataColumn[] columnArray;
