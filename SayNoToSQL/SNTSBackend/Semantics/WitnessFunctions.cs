@@ -112,5 +112,27 @@ namespace SNTSBackend.Semantics
 
             return DisjunctiveExamplesSpec.From(ppExamples);
         }
-    }
+
+
+        [WitnessFunction(nameof(Semantics.Comparator), 0)]
+        internal DisjunctiveExamplesSpec WitnessComparatorColumn(GrammarRule rule, ExampleSpec spec)
+        {
+            /* Inverse for the column field */
+            var ppExamples = new Dictionary<State, IEnumerable<object>>();
+
+            foreach (State input in spec.ProvidedInputs)
+            {
+                DataTable outputTable = (DataTable)spec.Examples[input];
+                DataTable[] tableList = (DataTable[])input[rule.Body[1]]; // Single table hack
+                var dataColumnArrayArray= tableList.SelectMany(t => t.Columns.Cast<DataColumn>().ToArray()).ToArray();
+                ppExamples[input] = dataColumnArrayArray; 
+
+            }
+
+            return DisjunctiveExamplesSpec.From(ppExamples);
+        }
+
+
+
+    } // End class
 }
