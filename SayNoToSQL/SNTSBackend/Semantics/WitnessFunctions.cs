@@ -112,6 +112,17 @@ namespace SNTSBackend.Semantics
                                 => x["ID"]).ToList().Contains(r["ID"])).ToList()).Rows.Cast<DataRow>().Select(t => t[column.ColumnName]).Min();
                             allPossibleSolutions.Add((object)minValueExcludedInColumn);
                             break;
+                        case "!=":
+                            var valuesExcludedInColumn =
+                                 (inputTable.AsEnumerable().Where(r => !outputTable.AsEnumerable().Select(x
+                                => x["ID"]).ToList().Contains(r["ID"])).ToList()).Rows.Cast<DataRow>().Select(t => t[column.ColumnName]).Distinct();
+                            // TODO: Get a linq guy to look this up
+                            if (valuesExcludedInColumn.Count() == 1)
+                            {
+                                allPossibleSolutions.Add(valuesInColumn.First());
+                            }
+                            // else, Keep it as empty
+                            break;
                         default:
                             // TODO: Unsupported datatype
                             break;
