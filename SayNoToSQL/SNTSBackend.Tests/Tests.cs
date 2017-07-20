@@ -102,7 +102,8 @@ namespace SNTSBackend.Tests
         [TestMethod]
         public void GeneratePowerSetTest()
         {
-            DataTable inputTable = CSVToDatatableParser.Parse(@"TestCases\Parser\TablePowerSet.csv");
+            //DataTable inputTable = CSVToDatatableParser.Parse(@"TestCases\Parser\TablePowerSet.csv");
+            DataTable inputTable = new DataTable();
             DataTable[] outputs = Utils.Utils.GeneratePowerSet(inputTable);
             Debug.Assert(outputs.Length == Math.Pow(2, inputTable.Rows.Count));
         }
