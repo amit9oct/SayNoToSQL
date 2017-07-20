@@ -1,14 +1,17 @@
-﻿using System.Collections.Generic;
+﻿#reference 'file:SNTSBackend.exe';
+#reference 'file:System.Data.dll';
+
+using System.Collections.Generic;
 using System.Data;
 
-using semantics ProseSample.Substrings.Semantics;
-using learners ProseSample.Substrings.WitnessFunctions;
+using semantics SNTSBackend.Semantics.Semantics;
+using learners SNTSBackend.Semantics.WitnessFunctions;
 
 language SayNoToSql;
 
 @start DataTable sql := select;
 
-DataTable select := SelectWithoutWhere(columnList,tableList);
+DataTable select := SelectWithoutWhere(columnArray,tableArray);
 
 @input DataTable[] tableArray;
 DataColumn[] columnArray;
