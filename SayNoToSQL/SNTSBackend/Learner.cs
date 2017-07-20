@@ -57,6 +57,12 @@ namespace SNTSBackend
             return programNode.First();
         }
 
+        public ProgramNode[] LearnSQLAll(DataTable inputTable, DataTable outputTable)
+        {
+            var spec = SpecFromStateOutput(inputTable, outputTable);
+            return LearnAll(spec, null, new Semantics.WitnessFunctions(Grammar));
+        }
+
         public DataTable Invoke(ProgramNode programNode, DataTable inputTable) {
             return (DataTable)programNode.Invoke(StateFromInput(inputTable));
         }

@@ -257,6 +257,30 @@
     <EmbeddedResource Include="TestCases\Synthesis\SelectWithWhere1-Output.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="TestCases\Synthesis\SelectWithWhere\SWW-NotEqual-Output.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestCases\Synthesis\SelectWithWhere\SWW-Equal-Input.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestCases\Synthesis\SelectWithWhere\SWW-LessEqual-Input.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestCases\Synthesis\SelectWithWhere\SWW-LessEqual-Output.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestCases\Synthesis\WithLogic-Output.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestCases\Synthesis\WithLogic-Input.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestCases\Synthesis\SelectWithWhere\SWW-Equal-Output.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestCases\Synthesis\SelectWithWhere\SWW-NotEqual-Input.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SNTSBackend\SNTSBackend.csproj">
