@@ -17,7 +17,7 @@ namespace SNTSBackend.Semantics
         internal DisjunctiveExamplesSpec WitnessSelectWithoutWhere(GrammarRule rule, ExampleSpec spec)
         {
 
-                var ppExamples = new Dictionary<State, IEnumerable<object>>();
+            var ppExamples = new Dictionary<State, IEnumerable<object>>();
 
             foreach (State input in spec.ProvidedInputs)
             {
@@ -86,7 +86,7 @@ namespace SNTSBackend.Semantics
          *  Comparator(DataColumn column, DataTable tableList, string cmpSymbol, object constValue)
          * */
         [WitnessFunction(nameof(Semantics.Comparator), 0)]
-        internal DisjunctiveExamplesSpec WitnessComparatorColumn(GrammarRule rule, ExampleSpec spec)
+        internal DisjunctiveExamplesSpec WitnessComparatorColumn(GrammarRule rule, DisjunctiveExamplesSpec spec)
         {
             /* Inverse for the column field */
             var ppExamples = new Dictionary<State, IEnumerable<object>>();
@@ -102,7 +102,7 @@ namespace SNTSBackend.Semantics
         }
 
         [WitnessFunction(nameof(Semantics.Comparator), 2)]
-        internal DisjunctiveExamplesSpec WitnessComparatorCmpSymbol(GrammarRule rule, ExampleSpec spec)
+        internal DisjunctiveExamplesSpec WitnessComparatorCmpSymbol(GrammarRule rule, DisjunctiveExamplesSpec spec)
         {
             /* Inverse for the constValue field */
             var ppExamples = new Dictionary<State, IEnumerable<object>>();
