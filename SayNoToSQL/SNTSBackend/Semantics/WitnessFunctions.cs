@@ -11,279 +11,250 @@ namespace SNTSBackend.Semantics
 {
     class WitnessFunctions : DomainLearningLogic
     {
-        public WitnessFunctions(Grammar grammar) : base(grammar) { }
+            public WitnessFunctions(Grammar grammar) : base(grammar) { }
 
-        [WitnessFunction(nameof(Semantics.SelectWithoutWhere), 0)]
-        internal DisjunctiveExamplesSpec WitnessSelectWithoutWhere(GrammarRule rule, ExampleSpec spec) {
+            [WitnessFunction(nameof(Semantics.SelectWithoutWhere), 0)]
+            internal DisjunctiveExamplesSpec WitnessSelectWithoutWhere(GrammarRule rule, ExampleSpec spec) {
 
-            var ppExamples = new Dictionary<State, IEnumerable<object>>();
+                var ppExamples = new Dictionary<State, IEnumerable<object>>();
 
-            foreach (State input in spec.ProvidedInputs) {
+                foreach (State input in spec.ProvidedInputs) {
 
-                var tableList = (DataTable[])input[rule.Body[1]];
-                var inputTable = tableList[0];
-                var desiredOutput = (DataTable)spec.Examples[input];
-                var allPossibleSolutions = new List<object>();
-                allPossibleSolutions.Add(desiredOutput.Columns.Cast<DataColumn>().ToArray());
-
-                ppExamples[input] = allPossibleSolutions;
-
-            }
-
-            return DisjunctiveExamplesSpec.From(ppExamples);
-
-        }
-
-        [WitnessFunction(nameof(Semantics.SelectWithWhere), 1)]
-        internal DisjunctiveExamplesSpec WitnessSelectWithWhereCondition(GrammarRule rule, ExampleSpec spec) {
-            var ppExamples = new Dictionary<State, IEnumerable<object>>();
-            //Complete the rows
-            return DisjunctiveExamplesSpec.From(ppExamples);
-        }
-
-        [WitnessFunction(nameof(Semantics.SelectWithWhere), 0, DependsOnParameters = new[] { 1 })]
-        internal DisjunctiveExamplesSpec WitnessSelectWithWhereColumnArray(GrammarRule rule, DisjunctiveExamplesSpec spec, ExampleSpec conditionSpec) {
-            var ppExamples = new Dictionary<State, IEnumerable<object>>();
-            var conditionTable = (DataTable)conditionSpec.Examples.Values.First();
-            foreach (State input in spec.ProvidedInputs) {
-
-                var inputTable = (DataTable)input[rule.Body[0]];
-                var desiredOutput = conditionTable;
-                var allPossibleSolutions = new List<object>();
-                allPossibleSolutions.Add(desiredOutput.Columns.Cast<DataColumn>().ToArray());
-
-                ppExamples[input] = allPossibleSolutions;
-
-            }
-
-            return DisjunctiveExamplesSpec.From(ppExamples);
-
-        }
-
-        /* Inverse for :
-         *  Comparator(DataColumn column, DataTable tableList, string cmpSymbol, object constValue)
-         * */
-        [WitnessFunction(nameof(Semantics.Comparator), 0)]
-        internal DisjunctiveExamplesSpec WitnessComparatorColumn(GrammarRule rule, ExampleSpec spec)
-        {
-            /* Inverse for the column field */
-            var ppExamples = new Dictionary<State, IEnumerable<object>>();
-
-            /*            foreach (State input in spec.ProvidedInputs)
-                        {
-                            DataTable outputTable = (DataTable)spec.Examples[input];
-                            DataTable[] tableList = (DataTable[])input[rule.Body[1]]; // Single table hack
-                            var dataColumnArrayArray= tableList.SelectMany(t => t.Columns.Cast<DataColumn>().ToArray()).ToArray();
-                            ppExamples[input] = dataColumnArrayArray; 
-
-                        }
-            */
-            return DisjunctiveExamplesSpec.From(ppExamples);
-        }
-
-        [WitnessFunction(nameof(Semantics.Comparator), 2)]
-        internal DisjunctiveExamplesSpec WitnessComparatorCmpSymbol(GrammarRule rule, ExampleSpec spec)
-        {
-            /* Inverse for the constValue field */
-            var ppExamples = new Dictionary<State, IEnumerable<object>>();
-
-            /*            foreach (State input in spec.ProvidedInputs)
-                        {
-                            DataTable outputTable = (DataTable)spec.Examples[input];
-                            DataTable inputTable = ((DataTable[])input[rule.Body[2]])[0];
-                            var allPossibleSolutions = new List<object>();
-                            string cmpSymbol = (string)input[rule.Body[2]]; // Get the comparison symbol
-                            DataColumn column = (DataColumn)input[rule.Body[0]]; // Column
-                            if (column.DataType == typeof(string))
-                            {
-                                switch (cmpSymbol)
-                                {
-                                    case "==":
-                                        var valuesInColumn =
-                                            outputTable.Rows.Cast<DataRow>().Select(t => t[column.ColumnName]).Distinct();
-                                        // TODO: Get a linq guy to look this up
-                                        if (valuesInColumn.Count() == 1)
-                                        {
-                                            allPossibleSolutions.Add(valuesInColumn.First());
-                                        }
-                                        // else, Keep it as empty
-
-                                        break;
-                                    default:
-                                        // TODO: Unsupported datatype
-                                        break;
-                                }
-
-                            }
-                            else if (column.DataType == typeof(double))
-                            {
-
-                                switch (cmpSymbol)
-                                {
-                                    case "==":
-                                        var valuesInColumn =
-                                             outputTable.Rows.Cast<DataRow>().Select(t => t[column.ColumnName]).Distinct();
-                                        // TODO: Get a linq guy to look this up
-                                        if (valuesInColumn.Count() == 1)
-                                        {
-                                            allPossibleSolutions.Add(valuesInColumn.First());
-                                        }
-                                        // else, Keep it as empty
-                                        break;
-
-                                    case ">=":
-                                        var minValueInColumn = outputTable.Rows.Cast<DataRow>().Select(t => t[column.ColumnName]).Min();
-                                        allPossibleSolutions.Add((object)minValueInColumn);
-                                        break;
-
-                                    case "<=":
-                                        var maxValueInColumn = outputTable.Rows.Cast<DataRow>().Select(t => t[column.ColumnName]).Max();
-                                        allPossibleSolutions.Add((object)maxValueInColumn);
-                                        break;
-
-                                    case ">":
-                                        var maxValueExcludedInColumn =
-                                            (inputTable.AsEnumerable().Where(r => !outputTable.AsEnumerable().Select(x
-                                            => x["ID"]).ToList().Contains(r["ID"])).ToList()).Rows.Cast<DataRow>().Select(t => t[column.ColumnName]).Max();
-                                        allPossibleSolutions.Add((object)maxValueExcludedInColumn);
-                                        break;
-                                    case "<":
-                                        var minValueExcludedInColumn =
-                                            (inputTable.AsEnumerable().Where(r => !outputTable.AsEnumerable().Select(x
-                                            => x["ID"]).ToList().Contains(r["ID"])).ToList()).Rows.Cast<DataRow>().Select(t => t[column.ColumnName]).Min();
-                                        allPossibleSolutions.Add((object)minValueExcludedInColumn);
-                                        break;
-                                    case "!=":
-                                        var valuesExcludedInColumn =
-                                             (inputTable.AsEnumerable().Where(r => !outputTable.AsEnumerable().Select(x
-                                            => x["ID"]).ToList().Contains(r["ID"])).ToList()).Rows.Cast<DataRow>().Select(t => t[column.ColumnName]).Distinct();
-                                        // TODO: Get a linq guy to look this up
-                                        if (valuesExcludedInColumn.Count() == 1)
-                                        {
-                                            allPossibleSolutions.Add(valuesInColumn.First());
-                                        }
-                                        // else, Keep it as empty
-                                        break;
-                                    default:
-                                        // TODO: Unsupported datatype
-                                        break;
-                                }
-                            }
-
-                            ppExamples[input] = allPossibleSolutions;
-
-                        }
-                        */
-            return DisjunctiveExamplesSpec.From(ppExamples);
-        }
-
-        [WitnessFunction(nameof(Semantics.Comparator), 3, DependsOnParameters = new[] { 0, 2})]
-        internal DisjunctiveExamplesSpec WitnessComparatorConstValue(GrammarRule rule, DisjunctiveExamplesSpec spec, ExampleSpec columnSpec, ExampleSpec cmpSymbolSpec) {
-            /* Inverse for the constValue field */
-            var ppExamples = new Dictionary<State, IEnumerable<object>>();
-
-/*            foreach (State input in spec.ProvidedInputs)
-            {
-                DataTable outputTable = (DataTable)spec.Examples[input];
-                DataTable inputTable = ((DataTable[])input[rule.Body[2]])[0];
-                var allPossibleSolutions = new List<object>();
-                string cmpSymbol = (string)input[rule.Body[2]]; // Get the comparison symbol
-                DataColumn column = (DataColumn)input[rule.Body[0]]; // Column
-                if (column.DataType == typeof(string))
-                {
-                    switch (cmpSymbol)
-                    {
-                        case "==":
-                            var valuesInColumn =
-                                outputTable.Rows.Cast<DataRow>().Select(t => t[column.ColumnName]).Distinct();
-                            // TODO: Get a linq guy to look this up
-                            if (valuesInColumn.Count() == 1)
-                            {
-                                allPossibleSolutions.Add(valuesInColumn.First());
-                            }
-                            // else, Keep it as empty
-
-                            break;
-                        default:
-                            // TODO: Unsupported datatype
-                            break;
+                    var tableList = (DataTable[])input[rule.Body[1]];
+                    var inputTable = tableList[0];
+                    var desiredOutput = (DataTable)spec.Examples[input];
+                    var allPossibleSolutions = new List<object>();
+                    if (desiredOutput.Rows.Count == inputTable.Rows.Count) {
+                        allPossibleSolutions.Add(desiredOutput.Columns.Cast<DataColumn>().ToArray());
                     }
+                    ppExamples[input] = allPossibleSolutions;
 
                 }
-                else if (column.DataType == typeof(double))
-                {
 
-                    switch (cmpSymbol)
+                return DisjunctiveExamplesSpec.From(ppExamples);
+
+            }
+
+            [WitnessFunction(nameof(Semantics.SelectWithWhere), 1)]
+            internal DisjunctiveExamplesSpec WitnessSelectWithWhereCondition(GrammarRule rule, ExampleSpec spec) {
+                var ppExamples = new Dictionary<State, IEnumerable<object>>();
+                foreach(State input in spec.ProvidedInputs) {
+                    var inputTable = ((DataTable[])input[rule.Grammar.InputSymbol])[0];
+                    var outputTable = (DataTable)spec.Examples[input];
+                    var conditionTable = inputTable.Clone();
+                    var allPossibleSolutions = new List<object>();
+                    foreach (DataRow row in outputTable.Rows) {
+                        //TODO: Make it a Primary Key
+                        var completeRow = inputTable.Select("PrimaryKey=" + row["PrimaryKey"]).First();
+                        conditionTable.ImportRow(completeRow);
+                    }
+                    allPossibleSolutions.Add(conditionTable);
+                    ppExamples[input] = allPossibleSolutions;
+                }
+                //Complete the rows
+                return DisjunctiveExamplesSpec.From(ppExamples);
+            }
+
+            [WitnessFunction(nameof(Semantics.SelectWithWhere), 0, DependsOnParameters = new[] { 1 })]
+            internal DisjunctiveExamplesSpec WitnessSelectWithWhereColumnArray(GrammarRule rule, DisjunctiveExamplesSpec spec, ExampleSpec conditionSpec) {
+                var ppExamples = new Dictionary<State, IEnumerable<object>>();
+                var conditionTable = (DataTable)conditionSpec.Examples.Values.First();
+                foreach (State input in spec.ProvidedInputs) {
+
+                    DataTable inputTable = ((DataTable[])input[rule.Grammar.InputSymbol])[0];
+                    var desiredOutput = conditionTable;
+                    var allPossibleSolutions = new List<object>();
+                    allPossibleSolutions.Add(desiredOutput.Columns.Cast<DataColumn>().ToArray());
+
+                    ppExamples[input] = allPossibleSolutions;
+
+                }
+
+                return DisjunctiveExamplesSpec.From(ppExamples);
+
+            }
+
+            /* Inverse for :
+             *  Comparator(DataColumn column, DataTable tableList, string cmpSymbol, object constValue)
+             * */
+            [WitnessFunction(nameof(Semantics.Comparator), 0)]
+            internal DisjunctiveExamplesSpec WitnessComparatorColumn(GrammarRule rule, ExampleSpec spec)
+            {
+                /* Inverse for the column field */
+                var ppExamples = new Dictionary<State, IEnumerable<object>>();
+                foreach (State input in spec.ProvidedInputs) {
+                    DataTable[] tableList = (DataTable[])input[rule.Grammar.InputSymbol]; // Single table hack
+                    var dataColumnArrayArray= tableList.SelectMany(t => t.Columns.Cast<DataColumn>().ToArray()).ToArray();
+                    ppExamples[input] = dataColumnArrayArray; 
+
+                }
+                
+                return DisjunctiveExamplesSpec.From(ppExamples);
+            }
+
+            [WitnessFunction(nameof(Semantics.Comparator), 2)]
+            internal DisjunctiveExamplesSpec WitnessComparatorCmpSymbol(GrammarRule rule, ExampleSpec spec)
+            {
+                /* Inverse for the constValue field */
+                var ppExamples = new Dictionary<State, IEnumerable<object>>();
+                foreach (State input in spec.ProvidedInputs) {
+                    var allPossibleSolutions = Semantics.CmpGen;
+                    ppExamples[input] = allPossibleSolutions;
+                }
+                return DisjunctiveExamplesSpec.From(ppExamples);
+            }
+
+            [WitnessFunction(nameof(Semantics.Comparator), 3, DependsOnParameters = new[] { 0, 2})]
+            internal DisjunctiveExamplesSpec WitnessComparatorConstValue(GrammarRule rule, DisjunctiveExamplesSpec spec, ExampleSpec columnSpec, ExampleSpec cmpSymbolSpec) {
+                /* Inverse for the constValue field */
+                var ppExamples = new Dictionary<State, IEnumerable<object>>();
+                
+            
+                foreach (State input in spec.ProvidedInputs)
+                {
+                    DataTable outputTable = (DataTable)spec.DisjunctiveExamples[input].First();
+                    DataTable inputTable = ((DataTable[])input[rule.Grammar.InputSymbol])[0];
+                    var allPossibleSolutions = new List<object>();
+                    if(outputTable.Rows.Count == 0) {
+                        ppExamples[input] = allPossibleSolutions;
+                        continue;
+                    }
+                    string cmpSymbol = (string)cmpSymbolSpec.Examples[cmpSymbolSpec.ProvidedInputs.First()]; // Get the comparison symbol
+                    DataColumn column = (DataColumn)columnSpec.Examples[columnSpec.ProvidedInputs.First()]; // Column
+
+                    bool flag = true ;
+                    
+                    if (column.DataType == typeof(string))
+
                     {
-                        case "==":
-                            var valuesInColumn =
-                                 outputTable.Rows.Cast<DataRow>().Select(t => t[column.ColumnName]).Distinct();
-                            // TODO: Get a linq guy to look this up
-                            if (valuesInColumn.Count() == 1)
+                        var mappedCmpSymbol = "";
+                        string valueToCompare = "";
+                        switch (cmpSymbol)
+                        {
+                            case "==":
+                                mappedCmpSymbol = "=";
+                                var valuesInColumn =
+                                    outputTable.Rows.Cast<DataRow>().Select(t => t[column.ColumnName]).Distinct();
+                                // TODO: Get a linq guy to look this up
+                                if (valuesInColumn.Count() != 1)
+                                {
+                                    flag = false;
+                                }
+                                else
+                                {
+                                    valueToCompare = (string)valuesInColumn.First();
+                                }
+                            // else, Keep it as empty
+
+                            break;
+                            default:
+                            // TODO: Unsupported datatype
+                                flag = false;
+                                break;
+                        }
+                        if (flag)
+                        {
+                            var countRowsInput = inputTable.Select(column.ColumnName + cmpSymbol + valueToCompare).Count();
+                            var countRowsOutput = inputTable.Select(column.ColumnName + cmpSymbol + valueToCompare).Count();
+                            if (flag && countRowsInput == countRowsOutput)
                             {
-                                allPossibleSolutions.Add(valuesInColumn.First());
+                                allPossibleSolutions.Add((object)valueToCompare);
                             }
+                        }
+                    }
+                    else if (column.DataType == typeof(double))
+                    {
+                        double valueToCompare = 0;
+                        var mappedCmpSymbol = "";
+
+                        switch (cmpSymbol)
+                        {
+                            case "==":
+                            mappedCmpSymbol = "=";
+                            var valuesInColumn =
+                                     outputTable.Rows.Cast<DataRow>().Select(t => t[column.ColumnName]).Distinct();
+                                // TODO: Get a linq guy to look this up
+                                if (valuesInColumn.Count() != 1)
+                                {
+                                    flag = false;
+                                }
+                                else
+                                {
+                                    valueToCompare = (double)valuesInColumn.First();
+                                }
                             // else, Keep it as empty
                             break;
 
-                        case ">=":
-                            var minValueInColumn = outputTable.Rows.Cast<DataRow>().Select(t => t[column.ColumnName]).Min();
-                            allPossibleSolutions.Add((object)minValueInColumn);
-                            break;
+                            case ">=":
+                            {
+                                mappedCmpSymbol = ">=";
+                                valueToCompare = (double)outputTable.Rows.Cast<DataRow>().Select(t => t[column.ColumnName]).Min();
+                                break;
+                            }
 
-                        case "<=":
-                            var maxValueInColumn = outputTable.Rows.Cast<DataRow>().Select(t => t[column.ColumnName]).Max();
-                            allPossibleSolutions.Add((object)maxValueInColumn);
-                            break;
+                            case "<=":
+                            {
+                                mappedCmpSymbol = "<=";
 
-                        case ">":
-                            var maxValueExcludedInColumn =
-                                (inputTable.AsEnumerable().Where(r => !outputTable.AsEnumerable().Select(x
-                                => x["ID"]).ToList().Contains(r["ID"])).ToList()).Rows.Cast<DataRow>().Select(t => t[column.ColumnName]).Max();
-                            allPossibleSolutions.Add((object)maxValueExcludedInColumn);
-                            break;
-                        case "<":
-                            var minValueExcludedInColumn =
-                                (inputTable.AsEnumerable().Where(r => !outputTable.AsEnumerable().Select(x
-                                => x["ID"]).ToList().Contains(r["ID"])).ToList()).Rows.Cast<DataRow>().Select(t => t[column.ColumnName]).Min();
-                            allPossibleSolutions.Add((object)minValueExcludedInColumn);
-                            break;
-                        case "!=":
+                                valueToCompare = (double)outputTable.Rows.Cast<DataRow>().Select(t => t[column.ColumnName]).Max();
+                                break;
+                            }
+
+                            case "<":
+                            {
+                                mappedCmpSymbol = "<";
+
+                                valueToCompare = (double)
+                                    (inputTable.AsEnumerable().Where(r => !outputTable.AsEnumerable().Select(x
+                                    => x[column.ColumnName]).ToList().Contains(r[column.ColumnName])).ToList()).Cast<DataRow>().Select(t => t[column.ColumnName]).Min();
+                                
+                                break;
+                            }
+                            case ">":
+                            mappedCmpSymbol = ">";
+
+                            valueToCompare = (double)
+                                    (inputTable.AsEnumerable().Where(r => !outputTable.AsEnumerable().Select(x
+                                    => x[column.ColumnName]).ToList().Contains(r[column.ColumnName])).ToList()).Cast<DataRow>().Select(t => t[column.ColumnName]).Max();
+                                break;
+                            case "!=":
+                            mappedCmpSymbol = "<>";
+
                             var valuesExcludedInColumn =
-                                 (inputTable.AsEnumerable().Where(r => !outputTable.AsEnumerable().Select(x
-                                => x["ID"]).ToList().Contains(r["ID"])).ToList()).Rows.Cast<DataRow>().Select(t => t[column.ColumnName]).Distinct();
-                            // TODO: Get a linq guy to look this up
-                            if (valuesExcludedInColumn.Count() == 1)
+                                     (inputTable.AsEnumerable().Where(r => !outputTable.AsEnumerable().Select(x
+                                    => x[column.ColumnName]).ToList().Contains(r[column.ColumnName])).ToList()).Cast<DataRow>().Select(t => t[column.ColumnName]).Distinct();
+                                // TODO: Get a linq guy to look this up
+                                if (valuesExcludedInColumn.Count() != 1)
+                                {
+                                    flag = false;
+                                }else
+                                {
+                                    valueToCompare = (double)valuesExcludedInColumn.First();
+                                }
+                                
+                                // else, Keep it as empty
+                                break;
+                            default:
+                                // TODO: Unsupported datatype
+                                flag = false;
+                                break;
+                        }
+
+                        if (flag)
+                        {
+                            var countRowsInput = inputTable.Select(column.ColumnName + mappedCmpSymbol + valueToCompare).Count();
+                            var countRowsOutput = outputTable.Select(column.ColumnName + mappedCmpSymbol + valueToCompare).Count();
+                            if (flag && countRowsInput == countRowsOutput && (countRowsInput !=0 || outputTable.Rows.Count == 0))
                             {
-                                allPossibleSolutions.Add(valuesInColumn.First());
+                                allPossibleSolutions.Add((object)valueToCompare);
                             }
-                            // else, Keep it as empty
-                            break;
-                        default:
-                            // TODO: Unsupported datatype
-                            break;
-                    }
+                        }
                 }
+                    ppExamples[input] = allPossibleSolutions;
 
-                ppExamples[input] = allPossibleSolutions;
-
+                }
+                return DisjunctiveExamplesSpec.From(ppExamples);
             }
-            */
-            return DisjunctiveExamplesSpec.From(ppExamples);
-        }
-
-        [WitnessFunction(nameof(Semantics.GetCmpSymbol), 0)]
-        internal DisjunctiveExamplesSpec WitnessGetCmpSymbol(GrammarRule rule, ExampleSpec spec)
-        {
-            var ppExamples = new Dictionary<State, IEnumerable<object>>();
-            /*
-            foreach (State input in spec.ProvidedInputs)
-            {
-                ppExamples[input] = Semantics.CmpGen;
-            }*/
-
-            return DisjunctiveExamplesSpec.From(ppExamples);
-        }
 
 
         } // End class

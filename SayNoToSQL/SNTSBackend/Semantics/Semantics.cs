@@ -11,19 +11,16 @@ namespace SNTSBackend.Semantics
 
         public static string[] LogicGen = { "AND", "OR" };
 
-        public static string GetCmpSymbol(int index) {
-            return CmpGen[index];
-        }
-
-        public static string GetLogicSymbol(int index) {
-            return LogicGen[index];
-        }
-
         public static DataTable SelectWithoutWhere(DataColumn[] columnArray, DataTable[] tableArray) {
             var columnsInTable = tableArray.Select(t => t.Columns.Cast<DataColumn>().ToArray()).ToArray();
             var columnNamesDict = columnArray.ToDictionary(c => c.ColumnName, c => c);
+            if(!(columnNamesDict.ContainsKey("PrimaryKey")))
+            {
+                columnNamesDict.Add("PrimaryKey", tableArray[0].PrimaryKey[0]);
+            }
+            
             var displayTable = new DataTable();
-            var displayColums = new List<DataColumn>();
+            var displayColumns = new List<DataColumn>();
             foreach (var columns in columnsInTable) {
                 foreach (var column in columns) {
                     //Check the data type as well as the name of the column
@@ -32,14 +29,19 @@ namespace SNTSBackend.Semantics
                         var newColumn = new DataColumn(column.ColumnName);
                         newColumn.DataType = column.DataType;
                         displayTable.Columns.Add(newColumn);
-                        displayColums.Add(newColumn);
+                        displayColumns.Add(newColumn);
                     }
                 }
             }
+
+
             //Currently supports one table
+            //adding primary key to new table created
+            displayTable.PrimaryKey = new DataColumn[] { displayTable.Columns["PrimaryKey"] };
+
             foreach (DataRow row in tableArray[0].Rows) {
                 DataRow newRow = displayTable.NewRow();
-                foreach(var cols in displayColums) {
+                foreach(var cols in displayColumns) {
                     newRow[cols.ColumnName] = row[cols.ColumnName];
                 }
                 displayTable.Rows.Add(newRow);
@@ -53,9 +55,28 @@ namespace SNTSBackend.Semantics
             return outputTable;
         }
 
+        public static DataTable Logical(DataTable cmpStatement, DataTable condition, string logicSymbol)
+        {
+            IEnumerable<DataRow> rows;
+            switch(logicSymbol)
+            {
+                case "AND":
+                    rows = cmpStatement.AsEnumerable().Intersect(condition.AsEnumerable(), new DataTableCustomComparator());
+                    break;
+                case "OR":
+                    rows = cmpStatement.AsEnumerable().Union(condition.AsEnumerable(), new DataTableCustomComparator());
+                    break;
+                default:
+                    rows = null;
+                    break;
+
+            }
+            return CreateOutputTableFromEnumerable(rows);
+        }
+
     public static DataTable Comparator(DataColumn column,DataTable[] tableList,string cmpSymbol,object constValue){
             // Picks a value from the set of values present in the column
-            var outputTable = new DataTable();
+            DataRow[] rows;
             DataTable table = tableList[0];
             string mappedCompSymbol;
             switch (cmpSymbol)
@@ -68,16 +89,38 @@ namespace SNTSBackend.Semantics
                     break;
             }
             if (column.DataType == typeof(double))
-            {   
-                outputTable = table.Select(column.ColumnName + mappedCompSymbol + constValue.ToString()).CopyToDataTable();
+            {
+                rows = table.Select(column.ColumnName + mappedCompSymbol + constValue.ToString());
             }
             else
             {
-                outputTable = table.Select(column.ColumnName + mappedCompSymbol + constValue.ToString()).CopyToDataTable();
+                rows = table.Select(column.ColumnName + mappedCompSymbol + "'" + constValue.ToString() + "'");
             }
-            return outputTable;
+            return CreateOutputTableFromRows(rows);
         }
-    }
+        public static DataTable CreateOutputTableFromRows(DataRow[] rows)
+        {
+            if(rows == null || rows.Length == 0)
+            {
+                return new DataTable();
+            }
+            else
+            {
+                return rows.CopyToDataTable();
+            }
+        }
+        public static DataTable CreateOutputTableFromEnumerable(IEnumerable<DataRow> rows)
+        {
+            if (rows == null || rows.Count() == 0)
+            { 
+                return new DataTable();
+            }
+            else
+            {
+                return rows.CopyToDataTable();
+            }
+        } 
+    } 
     
 
 }

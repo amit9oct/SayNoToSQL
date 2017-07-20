@@ -11,7 +11,7 @@ namespace SNTSBackend.Tests
         [TestMethod]
         public void CsvToDataTableConversionTest() {
             DataTable table = CSVToDatatableParser.Parse(@"TestCases\Parser\Table.csv");
-            Debug.Assert(table.Columns.Count == 3);
+            Debug.Assert(table.Columns.Count == 4);
             Debug.Assert(table.Rows.Count == 5);
             Debug.Assert((string)table.Rows[2]["Name"] == "Amitayush");
             Debug.Assert((string)table.Rows[2]["Uni"] == "Pilani");
@@ -61,6 +61,20 @@ namespace SNTSBackend.Tests
             Debug.Assert((string)desiredTable.Rows[1]["Uni"] == (string)transformedTable.Rows[1]["Uni"]);
             Debug.Assert((double)desiredTable.Rows[1]["Age"] == (double)transformedTable.Rows[1]["Age"]);
         }
+        [TestMethod]
+        public void LogicalTest()
+        {
+            DataTable table = CSVToDatatableParser.Parse(@"TestCases\Semantics\TableInput.csv");
+            DataColumn column = new DataColumn("Age", typeof(double));
+            DataTable firstTable = Semantics.Semantics.Comparator(column, new DataTable[] { table }, "==", 22);
+            column = new DataColumn("Uni", typeof(string));
+            DataTable secondTable = Semantics.Semantics.Comparator(column, new DataTable[] { table }, "==", "Pilani");
+            DataTable unionTable = Semantics.Semantics.Logical(firstTable, secondTable, "OR");
+            DataTable intersectTable = Semantics.Semantics.Logical(firstTable, secondTable, "AND");
+            Debug.Assert(unionTable.Rows.Count == 3);
+            Debug.Assert(intersectTable.Rows.Count == 1);
+
+        }
 
         [TestMethod]
         public void SelectWithoutWhereSynthesisTest() {
@@ -75,10 +89,23 @@ namespace SNTSBackend.Tests
         }
 
         [TestMethod]
-        public void SelectWithWhereSynthesisTest()
+        public void SelectWithWhereSynthesisTest1()
         {
-            DataTable inputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithoutWhere-Input.csv");
-            DataTable outputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithoutWhere-Output.csv");
+            DataTable inputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithWhere-Input.csv");
+            DataTable outputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithWhere-Output.csv");
+            var programNode = Learner.Instance.LearnSQL(inputTable, outputTable);
+            DataTable outputLearnt = Learner.Instance.Invoke(programNode, inputTable);
+            Debug.Assert(outputLearnt.Columns.Count == outputTable.Columns.Count);
+            Debug.Assert(outputLearnt.Rows.Count == outputTable.Rows.Count);
+            Debug.Assert((string)outputLearnt.Rows[0]["Name"] == (string)outputTable.Rows[0]["Name"]);
+            Debug.Assert((string)outputLearnt.Rows[1]["Name"] == (string)outputTable.Rows[1]["Name"]);
+        }
+
+        [TestMethod]
+        public void SelectWithWhereSynthesisTest2()
+        {
+            DataTable inputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithWhere1-Input.csv");
+            DataTable outputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithWhere1-Output.csv");
             var programNode = Learner.Instance.LearnSQL(inputTable, outputTable);
             DataTable outputLearnt = Learner.Instance.Invoke(programNode, inputTable);
             Debug.Assert(outputLearnt.Columns.Count == outputTable.Columns.Count);
