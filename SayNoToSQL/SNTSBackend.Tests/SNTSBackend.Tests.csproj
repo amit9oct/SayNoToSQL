@@ -245,10 +245,16 @@
     <None Include="TestCases\Semantics\TableOutputCondition.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <EmbeddedResource Include="TestCases\Synthesis\SelectWithWhere-Output.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="TestCases\Synthesis\SelectWithWhere-Input.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="TestCases\Synthesis\SelectWithWhere-Output .csv">
+    <EmbeddedResource Include="TestCases\Synthesis\SelectWithWhere1-Input.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestCases\Synthesis\SelectWithWhere1-Output.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
