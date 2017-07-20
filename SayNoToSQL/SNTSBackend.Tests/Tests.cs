@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SNTSBackend.Parser;
+using System;
 using System.Data;
 using System.Diagnostics;
 
@@ -16,6 +17,15 @@ namespace SNTSBackend.Tests
             Debug.Assert((string)table.Rows[2]["Name"] == "Amitayush");
             Debug.Assert((string)table.Rows[2]["Uni"] == "Pilani");
             Debug.Assert((double)table.Rows[2]["Age"] == 23);
+        }
+
+        [TestMethod]
+        public void CsvToDataTableConversionOutputTest()
+        {
+            DataTable table = CSVToDatatableParser.Parse(@"TestCases\Parser\Table.csv");
+            DataTable outputTable = CSVToDatatableParser.Parse(@"TestCases\Parser\TableOutput.csv", table);
+            //Debug.Assert(table.Rows[2][0] == outputTable.Rows[1][0]);
+            
         }
 
         [TestMethod]
@@ -79,7 +89,7 @@ namespace SNTSBackend.Tests
         [TestMethod]
         public void SelectWithoutWhereSynthesisTest() {
             DataTable inputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithoutWhere-Input.csv");
-            DataTable outputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithoutWhere-Output.csv");
+            DataTable outputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithoutWhere-Output.csv", inputTable);
             var programNode = Learner.Instance.LearnSQL(inputTable, outputTable);
             DataTable outputLearnt = Learner.Instance.Invoke(programNode, inputTable);
             Debug.Assert(outputLearnt.Columns.Count == outputTable.Columns.Count);
@@ -92,7 +102,7 @@ namespace SNTSBackend.Tests
         public void SelectWithWhereSynthesisTest1()
         {
             DataTable inputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithWhere-Input.csv");
-            DataTable outputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithWhere-Output.csv");
+            DataTable outputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithWhere-Output.csv", inputTable);
             var programNode = Learner.Instance.LearnSQL(inputTable, outputTable);
             DataTable outputLearnt = Learner.Instance.Invoke(programNode, inputTable);
             Debug.Assert(outputLearnt.Columns.Count == outputTable.Columns.Count);
@@ -105,7 +115,7 @@ namespace SNTSBackend.Tests
         public void SelectWithWhereSynthesisTest2()
         {
             DataTable inputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithWhere1-Input.csv");
-            DataTable outputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithWhere1-Output.csv");
+            DataTable outputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithWhere1-Output.csv",inputTable);
             var programNode = Learner.Instance.LearnSQL(inputTable, outputTable);
             DataTable outputLearnt = Learner.Instance.Invoke(programNode, inputTable);
             Debug.Assert(outputLearnt.Columns.Count == outputTable.Columns.Count);

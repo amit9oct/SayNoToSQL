@@ -203,26 +203,38 @@ namespace SNTSBackend.Semantics
                             case "<":
                             {
                                 mappedCmpSymbol = "<";
-
-                                valueToCompare = (double)
-                                    (inputTable.AsEnumerable().Where(r => !outputTable.AsEnumerable().Select(x
-                                    => x[column.ColumnName]).ToList().Contains(r[column.ColumnName])).ToList()).Cast<DataRow>().Select(t => t[column.ColumnName]).Min();
-                                
+                                var excludedRow1 = inputTable.AsEnumerable().Where(r => 
+                                                                                    !outputTable.AsEnumerable()
+                                                                                                .Select(x => 
+                                                                                                        x[column.ColumnName])
+                                                                                                .ToList()
+                                                                                                .Contains(r[column.ColumnName])
+                                                                               );
+                                if (excludedRow1 != null && excludedRow1.Count() != 0) {
+                                    valueToCompare = (double)
+                                        ((excludedRow1).ToList()).Cast<DataRow>().Select(t => t[column.ColumnName]).Min();
+                                }
                                 break;
                             }
                             case ">":
                             mappedCmpSymbol = ">";
-
-                            valueToCompare = (double)
-                                    (inputTable.AsEnumerable().Where(r => !outputTable.AsEnumerable().Select(x
-                                    => x[column.ColumnName]).ToList().Contains(r[column.ColumnName])).ToList()).Cast<DataRow>().Select(t => t[column.ColumnName]).Max();
+                            var excludedRow = inputTable.AsEnumerable().Where(r => !outputTable.AsEnumerable().Select(x
+                                    => x[column.ColumnName]).ToList().Contains(r[column.ColumnName]));
+                            if (excludedRow !=null && excludedRow.Count() != 0) {
+                                valueToCompare = (double)
+                                        (excludedRow.ToList()).Cast<DataRow>().Select(t => t[column.ColumnName]).Max();
+                            }
                                 break;
                             case "!=":
                             mappedCmpSymbol = "<>";
-
+                            var excluded2 = inputTable.AsEnumerable().Where(r => 
+                                                                            !outputTable.AsEnumerable()
+                                                                                        .Select(x => 
+                                                                                                x[column.ColumnName]).ToList()
+                                                                                                                     .Contains(r[column.ColumnName])
+                                                                            );
                             var valuesExcludedInColumn =
-                                     (inputTable.AsEnumerable().Where(r => !outputTable.AsEnumerable().Select(x
-                                    => x[column.ColumnName]).ToList().Contains(r[column.ColumnName])).ToList()).Cast<DataRow>().Select(t => t[column.ColumnName]).Distinct();
+                                     ((excluded2).ToList()).Cast<DataRow>().Select(t => t[column.ColumnName]).Distinct();
                                 // TODO: Get a linq guy to look this up
                                 if (valuesExcludedInColumn.Count() != 1)
                                 {

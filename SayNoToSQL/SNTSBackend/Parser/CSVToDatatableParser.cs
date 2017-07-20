@@ -8,13 +8,13 @@ namespace SNTSBackend.Parser
 {
     public static class CSVToDatatableParser
     { 
-        public static DataTable Parse(String inputFile, Boolean headerPresent = true)
+        public static DataTable Parse(String inputFile, int startNumber = 0, Boolean headerPresent = true)
         {
             DataTable table = new DataTable();
             List<DataColumn> cols = new List<DataColumn>();
             using (TextFieldParser parser = new TextFieldParser(inputFile))
             {
-                int rowCount = 0;
+                int rowCount = startNumber;
                 parser.TextFieldType = FieldType.Delimited;
                 //hardcoded - should input
                 parser.SetDelimiters(",");
@@ -53,7 +53,33 @@ namespace SNTSBackend.Parser
             }
             return table;
         }
+        public static DataTable Parse(String inputFile, DataTable inputTable, Boolean headerPresent = true)
+        {
+            DataTable table = Parse(inputFile, 999);
+            foreach(DataRow row in table.Rows)
+            {
+                foreach(DataRow inputRow in inputTable.Rows)
+                {
+                    Boolean isSame = true;
+                    foreach(DataColumn col in table.Columns)
+                    {
+                        var x = row[col.ColumnName];
+                        var y = inputRow[col.ColumnName];
+                        if((col.ColumnName != "PrimaryKey") 
+                            && (!(row[col.ColumnName].Equals(inputRow[col.ColumnName]))))
+                        {
+                            isSame = false;
+                        }
 
+                    }
+                    if(isSame)
+                    {
+                        row["PrimaryKey"] = inputRow["PrimaryKey"];
+                    }
+                }
+            }
+            return table;
+        }
         public static void ShowTable(DataTable table)
         {
             foreach (DataColumn col in table.Columns)
