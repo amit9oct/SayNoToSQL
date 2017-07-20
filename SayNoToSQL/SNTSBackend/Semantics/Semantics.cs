@@ -11,14 +11,6 @@ namespace SNTSBackend.Semantics
 
         public static string[] LogicGen = { "AND", "OR" };
 
-        public static string GetCmpSymbol(int index) {
-            return CmpGen[index];
-        }
-
-        public static string GetLogicSymbol(int index) {
-            return LogicGen[index];
-        }
-
         public static DataTable SelectWithoutWhere(DataColumn[] columnArray, DataTable[] tableArray) {
             var columnsInTable = tableArray.Select(t => t.Columns.Cast<DataColumn>().ToArray()).ToArray();
             var columnNamesDict = columnArray.ToDictionary(c => c.ColumnName, c => c);
