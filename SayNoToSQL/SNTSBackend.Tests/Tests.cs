@@ -123,6 +123,14 @@ namespace SNTSBackend.Tests
             Debug.Assert((string)outputLearnt.Rows[0]["Name"] == (string)outputTable.Rows[0]["Name"]);
             Debug.Assert((string)outputLearnt.Rows[1]["Name"] == (string)outputTable.Rows[1]["Name"]);
         }
+
+        [TestMethod]
+        public void GeneratePowerSetTest()
+        {
+            DataTable inputTable = new DataTable();
+            DataTable[] outputs = Utils.Utils.GeneratePowerSet(inputTable);
+            Debug.Assert(outputs.Length == Math.Pow(2, inputTable.Rows.Count));
+        }
     }
 
 }
