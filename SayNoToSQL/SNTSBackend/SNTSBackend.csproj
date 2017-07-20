@@ -216,6 +216,7 @@
   <ItemGroup>
     <Compile Include="Learner.cs" />
     <Compile Include="Parser\CSVToDatatableParser.cs" />
+    <Compile Include="Parser\DatatableToCSVWriter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Semantics\Semantics.cs" />
