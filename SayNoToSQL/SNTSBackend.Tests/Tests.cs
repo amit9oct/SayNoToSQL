@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SNTSBackend.Parser;
+using System;
 using System.Data;
 using System.Diagnostics;
 
@@ -95,6 +96,15 @@ namespace SNTSBackend.Tests
             Debug.Assert(outputLearnt.Rows.Count == outputTable.Rows.Count);
             Debug.Assert((string)outputLearnt.Rows[4]["Name"] == (string)outputTable.Rows[4]["Name"]);
             Debug.Assert((string)outputLearnt.Rows[4]["Uni"] == (string)outputTable.Rows[4]["Uni"]);
+        }
+
+
+        [TestMethod]
+        public void GeneratePowerSetTest()
+        {
+            DataTable inputTable = CSVToDatatableParser.Parse(@"TestCases\Parser\TablePowerSet.csv");
+            DataTable[] outputs = Utils.Utils.GeneratePowerSet(inputTable);
+            Debug.Assert(outputs.Length == Math.Pow(2, inputTable.Rows.Count));
         }
     }
 

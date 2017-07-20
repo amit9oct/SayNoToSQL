@@ -40,5 +40,30 @@ namespace SNTSBackend.Utils
             write();
             Console.ForegroundColor = currentColor;
         }
+
+        public static DataTable[] GeneratePowerSet(DataTable table)
+        {
+            List<DataTable> outputTables = new List<DataTable>();
+            int n = table.Rows.Count;
+
+            // Power set contains 2^N subsets.
+            int powerSetCount = 1 << n;
+
+            for (int setMask = 0; setMask < powerSetCount; setMask++)
+            {
+                DataTable outputTable = table.Clone();
+                for (int i = 0; i < n; i++)
+                {
+                    // Checking whether i'th element of input collection should go to the current subset.
+                    if ((setMask & (1 << i)) > 0)
+                    {
+                        outputTable.ImportRow(table.Rows[i]);
+                    }
+                }
+                outputTables.Add(outputTable);
+            }
+
+            return outputTables.ToArray();
+        }
     }
 }
