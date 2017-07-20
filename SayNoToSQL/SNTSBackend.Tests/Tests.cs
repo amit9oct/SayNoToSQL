@@ -56,6 +56,7 @@ namespace SNTSBackend.Tests
             DataTable transformedTable = Semantics.Semantics.Comparator(column, new DataTable[] { table }, "==", 22);
             DataTable desiredTable = CSVToDatatableParser.Parse(@"TestCases\Semantics\TableOutputCondition.csv");
             Debug.Assert(desiredTable.Columns.Count == transformedTable.Columns.Count);
+            Debug.Assert(table.Rows.Count != transformedTable.Rows.Count);
             Debug.Assert((string)desiredTable.Rows[1]["Name"] == (string)transformedTable.Rows[1]["Name"]);
             Debug.Assert((string)desiredTable.Rows[1]["Uni"] == (string)transformedTable.Rows[1]["Uni"]);
             Debug.Assert((double)desiredTable.Rows[1]["Age"] == (double)transformedTable.Rows[1]["Age"]);

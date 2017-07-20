@@ -49,33 +49,8 @@ namespace SNTSBackend.Semantics
 
         public static DataTable SelectWithWhere(DataColumn[] columnArray, DataTable table)
         {
-            var columnsInTable = table.Columns.Cast<DataColumn>().ToArray();
-            var columnNamesDict = columnArray.ToDictionary(c => c.ColumnName, c => c);
-            var displayTable = new DataTable();
-            var displayColums = new List<DataColumn>();
-            foreach (var column in columnsInTable)
-            {
-                    //Check the data type as well as the name of the column
-                    if (columnNamesDict.ContainsKey(column.ColumnName) &&
-                        columnNamesDict[column.ColumnName].DataType == column.DataType)
-                    {
-                        var newColumn = new DataColumn(column.ColumnName);
-                        newColumn.DataType = column.DataType;
-                        displayTable.Columns.Add(newColumn);
-                        displayColums.Add(newColumn);
-                    }
-            }
-            //Currently supports one table
-            foreach (DataRow row in table.Rows)
-            {
-                DataRow newRow = displayTable.NewRow();
-                foreach (var cols in displayColums)
-                {
-                    newRow[cols.ColumnName] = row[cols.ColumnName];
-                }
-                displayTable.Rows.Add(newRow);
-            }
-            return displayTable;
+            var outputTable = SelectWithoutWhere(columnArray, new DataTable[] { table });
+            return outputTable;
         }
         //public static DataTable Comparator(DataColumn column, DataTable[] tableList, string cmpSymbol) {
         //    return new DataTable();
@@ -97,7 +72,7 @@ namespace SNTSBackend.Semantics
                     break;
             }
             if (column.DataType == typeof(double))
-            {   // Krishnan does not know C# but wrote this anyway
+            {   
                 outputTable = table.Select(column.ColumnName + mappedCompSymbol + constValue.ToString()).CopyToDataTable();
             }
             else
@@ -110,8 +85,4 @@ namespace SNTSBackend.Semantics
     
 
 }
-
-        /* For the inverse:
-            var x = table.Rows.Cast<DataRow>().Select(r => r[column.ColumnName]).Distinct().ToArray();
-        */
     
