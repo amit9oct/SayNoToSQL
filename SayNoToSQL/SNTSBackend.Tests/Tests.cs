@@ -34,6 +34,35 @@ namespace SNTSBackend.Tests
         }
 
         [TestMethod]
+        public void SelectWithWhereTest()
+        {
+            DataTable table = CSVToDatatableParser.Parse(@"TestCases\Semantics\TableInput.csv");
+            DataColumn[] columns = {
+                                    new DataColumn("Name",typeof(string)),
+                                    new DataColumn("Uni",typeof(string))
+                                 };
+            DataTable transformedTable = Semantics.Semantics.SelectWithWhere(columns, table);
+            DataTable desiredTable = CSVToDatatableParser.Parse(@"TestCases\Semantics\TableOutput.csv");
+            Debug.Assert(desiredTable.Columns.Count == transformedTable.Columns.Count);
+            Debug.Assert(desiredTable.Rows.Count == transformedTable.Rows.Count);
+            Debug.Assert((string)desiredTable.Rows[4]["Name"] == (string)transformedTable.Rows[4]["Name"]);
+            Debug.Assert((string)desiredTable.Rows[4]["Uni"] == (string)transformedTable.Rows[4]["Uni"]);
+        }
+
+        [TestMethod]
+        public void ComparatorTest() {
+            DataTable table = CSVToDatatableParser.Parse(@"TestCases\Semantics\TableInput.csv");
+            DataColumn column = new DataColumn("Age", typeof(double));
+            DataTable transformedTable = Semantics.Semantics.Comparator(column, new DataTable[] { table }, "==", 22);
+            DataTable desiredTable = CSVToDatatableParser.Parse(@"TestCases\Semantics\TableOutputCondition.csv");
+            Debug.Assert(desiredTable.Columns.Count == transformedTable.Columns.Count);
+            Debug.Assert(table.Rows.Count != transformedTable.Rows.Count);
+            Debug.Assert((string)desiredTable.Rows[1]["Name"] == (string)transformedTable.Rows[1]["Name"]);
+            Debug.Assert((string)desiredTable.Rows[1]["Uni"] == (string)transformedTable.Rows[1]["Uni"]);
+            Debug.Assert((double)desiredTable.Rows[1]["Age"] == (double)transformedTable.Rows[1]["Age"]);
+        }
+
+        [TestMethod]
         public void SelectWithoutWhereSynthesisTest() {
             DataTable inputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithoutWhere-Input.csv");
             DataTable outputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithoutWhere-Output.csv");

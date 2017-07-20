@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -6,6 +7,18 @@ using System.Linq;
 namespace SNTSBackend.Semantics
 {
     public static class Semantics {
+        public static string[] CmpGen = { "<=", ">=", "==", "!=", "<", ">" };
+
+        public static string[] LogicGen = { "AND", "OR" };
+
+        public static string GetCmpSymbol(int index) {
+            return CmpGen[index];
+        }
+
+        public static string GetLogicSymbol(int index) {
+            return LogicGen[index];
+        }
+
         public static DataTable SelectWithoutWhere(DataColumn[] columnArray, DataTable[] tableArray) {
             var columnsInTable = tableArray.Select(t => t.Columns.Cast<DataColumn>().ToArray()).ToArray();
             var columnNamesDict = columnArray.ToDictionary(c => c.ColumnName, c => c);
@@ -33,5 +46,39 @@ namespace SNTSBackend.Semantics
             }
             return displayTable;  
         }
+
+        public static DataTable SelectWithWhere(DataColumn[] columnArray, DataTable table)
+        {
+            var outputTable = SelectWithoutWhere(columnArray, new DataTable[] { table });
+            return outputTable;
+        }
+
+    public static DataTable Comparator(DataColumn column,DataTable[] tableList,string cmpSymbol,object constValue){
+            // Picks a value from the set of values present in the column
+            var outputTable = new DataTable();
+            DataTable table = tableList[0];
+            string mappedCompSymbol;
+            switch (cmpSymbol)
+            {
+                case "==": mappedCompSymbol = "=";
+                    break;
+                case "!=": mappedCompSymbol = "<>";
+                    break;
+                default: mappedCompSymbol = cmpSymbol;
+                    break;
+            }
+            if (column.DataType == typeof(double))
+            {   
+                outputTable = table.Select(column.ColumnName + mappedCompSymbol + constValue.ToString()).CopyToDataTable();
+            }
+            else
+            {
+                outputTable = table.Select(column.ColumnName + mappedCompSymbol + constValue.ToString()).CopyToDataTable();
+            }
+            return outputTable;
+        }
     }
+    
+
 }
+    
