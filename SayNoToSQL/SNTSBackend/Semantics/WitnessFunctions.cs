@@ -49,7 +49,7 @@ namespace SNTSBackend.Semantics
             foreach (State input in spec.ProvidedInputs)
             {
                 DataTable outputTable = (DataTable)spec.Examples[input];
-
+                DataTable inputTable = ((DataTable[])input[rule.Body[2]])[0];
                 var allPossibleSolutions = new List<object>();
                 string cmpSymbol = (string)input[rule.Body[2]]; // Get the comparison symbol
                 DataColumn column = (DataColumn)input[rule.Body[0]]; // Column
@@ -102,16 +102,16 @@ namespace SNTSBackend.Semantics
 
                         case ">":
                             var maxValueExcludedInColumn =
-                                (input.AsEnumerable().Where(r => !outputTable.AsEnumerable().Select(x
+                                (inputTable.AsEnumerable().Where(r => !outputTable.AsEnumerable().Select(x
                                 => x["ID"]).ToList().Contains(r["ID"])).ToList()).Rows.Cast<DataRow>().Select(t => t[column.ColumnName]).Max();
                             allPossibleSolutions.Add((object)maxValueExcludedInColumn);
-
+                            break;
                         case "<":
                             var minValueExcludedInColumn =
-                                (input.AsEnumerable().Where(r => !outputTable.AsEnumerable().Select(x
+                                (inputTable.AsEnumerable().Where(r => !outputTable.AsEnumerable().Select(x
                                 => x["ID"]).ToList().Contains(r["ID"])).ToList()).Rows.Cast<DataRow>().Select(t => t[column.ColumnName]).Min();
                             allPossibleSolutions.Add((object)minValueExcludedInColumn);
-
+                            break;
                         default:
                             // TODO: Unsupported datatype
                             break;
@@ -144,7 +144,19 @@ namespace SNTSBackend.Semantics
             return DisjunctiveExamplesSpec.From(ppExamples);
         }
 
+        [WitnessFunction(nameof(Semantics.GetCmpSymbol), 0)]
+        internal DisjunctiveExamplesSpec WitnessGetCmpSymbol(GrammarRule rule, ExampleSpec spec)
+        {
+            var ppExamples = new Dictionary<State, IEnumerable<object>>();
+
+            foreach (State input in spec.ProvidedInputs)
+            {
+                ppExamples[input] = Semantics.CmpGen;
+            }
+
+            return DisjunctiveExamplesSpec.From(ppExamples);
+        }
 
 
-    } // End class
-}
+        } // End class
+    }
