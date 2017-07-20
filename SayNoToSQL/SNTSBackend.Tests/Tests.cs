@@ -155,6 +155,24 @@ namespace SNTSBackend.Tests
         }
 
         [TestMethod]
+        public void SelectWithWhereEqualSynthesisTest()
+        {
+            DataTable inputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithWhere\SWW-Equal-Input.csv");
+            DataTable outputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithWhere\SWW-Equal-Output.csv", inputTable);
+            var generatedPrograms = Learner.Instance.LearnSQLAll(inputTable, outputTable);
+
+            Debug.Assert(generatedPrograms.Length >= 1);
+            foreach (var programNode in generatedPrograms)
+            {
+                DataTable outputLearnt = Learner.Instance.Invoke(programNode, inputTable);
+                Debug.Assert(outputLearnt.Columns.Count == outputTable.Columns.Count);
+                Debug.Assert(outputLearnt.Rows.Count == outputTable.Rows.Count);
+                Utils.Utils.EqualColumns(outputLearnt, outputTable, "PrimaryKey");
+            }
+        }
+
+
+        [TestMethod]
         public void SelectWithWhereLessEqualSynthesisTest()
         {
             DataTable inputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithWhere\SWW-LessEqual-Input.csv");

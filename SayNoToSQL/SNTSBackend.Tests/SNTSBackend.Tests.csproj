@@ -260,7 +260,7 @@
     <EmbeddedResource Include="TestCases\Synthesis\SelectWithWhere\SWW-NotEqual-Output.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="TestCases\Synthesis\SelectWithWhere\SWW-NotEqual-Input.csv">
+    <EmbeddedResource Include="TestCases\Synthesis\SelectWithWhere\SWW-Equal-Input.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="TestCases\Synthesis\SelectWithWhere\SWW-LessEqual-Input.csv">
@@ -273,6 +273,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="TestCases\Synthesis\WithLogic-Input.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestCases\Synthesis\SelectWithWhere\SWW-Equal-Output.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestCases\Synthesis\SelectWithWhere\SWW-NotEqual-Input.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
