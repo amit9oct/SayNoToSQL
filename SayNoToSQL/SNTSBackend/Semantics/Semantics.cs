@@ -71,7 +71,7 @@ namespace SNTSBackend.Semantics
                     break;
 
             }
-            return CreateOutputTableFromEnumerable(rows);
+            return Utils.Utils.CreateOutputTableFromEnumerable(rows);
         }
 
     public static DataTable Comparator(DataColumn column,DataTable[] tableList,string cmpSymbol,object constValue){
@@ -96,30 +96,8 @@ namespace SNTSBackend.Semantics
             {
                 rows = table.Select(column.ColumnName + mappedCompSymbol + "'" + constValue.ToString() + "'");
             }
-            return CreateOutputTableFromRows(rows);
+            return Utils.Utils.CreateOutputTableFromRows(rows);
         }
-        public static DataTable CreateOutputTableFromRows(DataRow[] rows)
-        {
-            if(rows == null || rows.Length == 0)
-            {
-                return new DataTable();
-            }
-            else
-            {
-                return rows.CopyToDataTable();
-            }
-        }
-        public static DataTable CreateOutputTableFromEnumerable(IEnumerable<DataRow> rows)
-        {
-            if (rows == null || rows.Count() == 0)
-            { 
-                return new DataTable();
-            }
-            else
-            {
-                return rows.CopyToDataTable();
-            }
-        } 
     } 
     
 

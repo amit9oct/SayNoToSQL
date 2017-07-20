@@ -51,7 +51,7 @@ namespace SNTSBackend.Utils
                 // Power set contains 2^N subsets.
                 int powerSetCount = 1 << n;
 
-                for (int setMask = 0; setMask < powerSetCount; setMask++)
+                for (int setMask = 1; setMask < powerSetCount; setMask++)
                 {
                     DataTable outputTable = table.Clone();
                     for (int i = 0; i < n; i++)
@@ -66,6 +66,29 @@ namespace SNTSBackend.Utils
                 }
             }
             return outputTables.ToArray();
+        }
+
+        public static DataTable CreateOutputTableFromRows(DataRow[] rows)
+        {
+            if (rows == null || rows.Length == 0)
+            {
+                return new DataTable();
+            }
+            else
+            {
+                return rows.CopyToDataTable();
+            }
+        }
+        public static DataTable CreateOutputTableFromEnumerable(IEnumerable<DataRow> rows)
+        {
+            if (rows == null || rows.Count() == 0)
+            {
+                return new DataTable();
+            }
+            else
+            {
+                return rows.CopyToDataTable();
+            }
         }
     }
 }

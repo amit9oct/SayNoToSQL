@@ -127,9 +127,24 @@ namespace SNTSBackend.Tests
         [TestMethod]
         public void GeneratePowerSetTest()
         {
-            DataTable inputTable = new DataTable();
+            DataTable inputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\WithLogic-Input.csv");
             DataTable[] outputs = Utils.Utils.GeneratePowerSet(inputTable);
-            Debug.Assert(outputs.Length == Math.Pow(2, inputTable.Rows.Count));
+            Debug.Assert(outputs.Length == Math.Pow(2, inputTable.Rows.Count)-1);
+        }
+
+        [TestMethod]
+        public void LogicalSynthesisTest()
+        {
+            DataTable inputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\WithLogic-Input.csv");
+            DataTable outputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\WithLogic-Output.csv", inputTable);
+            var programNode = Learner.Instance.LearnSQL(inputTable, outputTable);
+            DataTable outputLearnt = Learner.Instance.Invoke(programNode, inputTable);
+            Debug.Assert(outputLearnt.Columns.Count == outputTable.Columns.Count);
+            Debug.Assert(outputLearnt.Rows.Count == outputTable.Rows.Count);
+            Debug.Assert((int)outputLearnt.Rows[0]["Age"] == 22);
+            Debug.Assert((int)outputLearnt.Rows[1]["Age"] == 22);
+            Debug.Assert((string)outputLearnt.Rows[1]["Uni"] == "Pilani");
+            Debug.Assert((string)outputLearnt.Rows[0]["Uni"] == "Pilani");
         }
     }
 
