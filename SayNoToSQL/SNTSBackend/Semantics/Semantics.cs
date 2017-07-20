@@ -52,10 +52,6 @@ namespace SNTSBackend.Semantics
             var outputTable = SelectWithoutWhere(columnArray, new DataTable[] { table });
             return outputTable;
         }
-        //public static DataTable Comparator(DataColumn column, DataTable[] tableList, string cmpSymbol) {
-        //    return new DataTable();
-        //}
-        //public static DataTable Logical(DataTable cmpStatement, @recurse[5] condition, logicSymbol)
 
     public static DataTable Comparator(DataColumn column,DataTable[] tableList,string cmpSymbol,object constValue){
             // Picks a value from the set of values present in the column
