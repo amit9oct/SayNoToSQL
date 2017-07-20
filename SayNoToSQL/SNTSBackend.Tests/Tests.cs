@@ -90,12 +90,75 @@ namespace SNTSBackend.Tests
         public void SelectWithoutWhereSynthesisTest() {
             DataTable inputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithoutWhere-Input.csv");
             DataTable outputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithoutWhere-Output.csv", inputTable);
-            var programNode = Learner.Instance.LearnSQL(inputTable, outputTable);
-            DataTable outputLearnt = Learner.Instance.Invoke(programNode, inputTable);
-            Debug.Assert(outputLearnt.Columns.Count == outputTable.Columns.Count);
-            Debug.Assert(outputLearnt.Rows.Count == outputTable.Rows.Count);
-            Debug.Assert((string)outputLearnt.Rows[4]["Name"] == (string)outputTable.Rows[4]["Name"]);
-            Debug.Assert((string)outputLearnt.Rows[4]["Uni"] == (string)outputTable.Rows[4]["Uni"]);
+            var generatedPrograms = Learner.Instance.LearnSQLAll(inputTable, outputTable);
+            foreach (var programNode in generatedPrograms)
+            {
+                DataTable outputLearnt = Learner.Instance.Invoke(programNode, inputTable);
+                Debug.Assert(outputLearnt.Columns.Count == outputTable.Columns.Count);
+                Debug.Assert(outputLearnt.Rows.Count == outputTable.Rows.Count);
+                Utils.Utils.EqualColumns(outputLearnt, outputTable, "PrimaryKey");
+            }
+        }
+
+        [TestMethod]
+        public void SelectWithWhereSynthesisTest1()
+        {
+            DataTable inputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithWhere-Input.csv");
+            DataTable outputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithWhere-Output.csv", inputTable);
+            var generatedPrograms = Learner.Instance.LearnSQLAll(inputTable, outputTable);
+            foreach (var programNode in generatedPrograms)
+            {
+                DataTable outputLearnt = Learner.Instance.Invoke(programNode, inputTable);
+                Debug.Assert(outputLearnt.Columns.Count == outputTable.Columns.Count);
+                Debug.Assert(outputLearnt.Rows.Count == outputTable.Rows.Count);
+                Utils.Utils.EqualColumns(outputLearnt, outputTable, "PrimaryKey");
+            }
+        }
+
+        [TestMethod]
+        public void SelectWithWhereSynthesisTest2()
+        {
+            DataTable inputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithWhere1-Input.csv");
+            DataTable outputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithWhere1-Output.csv",inputTable);
+            var generatedPrograms = Learner.Instance.LearnSQLAll(inputTable, outputTable);
+            foreach (var programNode in generatedPrograms)
+            {
+                DataTable outputLearnt = Learner.Instance.Invoke(programNode, inputTable);
+                Debug.Assert(outputLearnt.Columns.Count == outputTable.Columns.Count);
+                Debug.Assert(outputLearnt.Rows.Count == outputTable.Rows.Count);
+                Utils.Utils.EqualColumns(outputLearnt, outputTable, "PrimaryKey");
+            }
+        }
+
+
+        [TestMethod]
+        public void SelectWithWhereNotEqualSynthesisTest()
+        {
+            DataTable inputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithWhere\SWW-NotEqual-Input.csv");
+            DataTable outputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithWhere\SWW-NotEqual-Output.csv", inputTable);
+            var generatedPrograms = Learner.Instance.LearnSQLAll(inputTable, outputTable);
+            foreach(var programNode in generatedPrograms)
+            {
+                DataTable outputLearnt = Learner.Instance.Invoke(programNode, inputTable);
+                Debug.Assert(outputLearnt.Columns.Count == outputTable.Columns.Count);
+                Debug.Assert(outputLearnt.Rows.Count == outputTable.Rows.Count);
+                Utils.Utils.EqualColumns(outputLearnt, outputTable, "PrimaryKey");
+            }
+        }
+
+        [TestMethod]
+        public void SelectWithWhereLessEqualSynthesisTest()
+        {
+            DataTable inputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithWhere\SWW-LessEqual-Input.csv");
+            DataTable outputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithWhere\SWW-LessEqual-Output.csv", inputTable);
+            var generatedPrograms = Learner.Instance.LearnSQLAll(inputTable, outputTable);
+            foreach (var programNode in generatedPrograms)
+            {
+                DataTable outputLearnt = Learner.Instance.Invoke(programNode, inputTable);
+                Debug.Assert(outputLearnt.Columns.Count == outputTable.Columns.Count);
+                Debug.Assert(outputLearnt.Rows.Count == outputTable.Rows.Count);
+                Utils.Utils.EqualColumns(outputLearnt, outputTable, "PrimaryKey");
+            }
         }
 
         [TestMethod]
@@ -127,7 +190,7 @@ namespace SNTSBackend.Tests
         [TestMethod]
         public void GeneratePowerSetTest()
         {
-            DataTable inputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\WithLogic-Input.csv");
+            DataTable inputTable = new DataTable();
             DataTable[] outputs = Utils.Utils.GeneratePowerSet(inputTable);
             Debug.Assert(outputs.Length == Math.Pow(2, inputTable.Rows.Count)-1);
         }

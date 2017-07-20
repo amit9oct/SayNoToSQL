@@ -90,5 +90,15 @@ namespace SNTSBackend.Utils
                 return rows.CopyToDataTable();
             }
         }
+
+        public static bool EqualColumns(DataTable t1, DataTable t2, string columnName)
+        {
+            var c1= t1.AsEnumerable().Select(r => r.Field< object >(columnName)).ToList();
+            c1.Sort();
+            var c2 = t2.AsEnumerable().Select(r => r.Field<object>(columnName)).ToList();
+            c2.Sort();
+            return c1.Equals(c2);
+        }
+
     }
 }
