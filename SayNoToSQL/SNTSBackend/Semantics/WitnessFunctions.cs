@@ -100,6 +100,18 @@ namespace SNTSBackend.Semantics
                             allPossibleSolutions.Add((object)maxValueInColumn);
                             break;
 
+                        case ">":
+                            var maxValueExcludedInColumn =
+                                (input.AsEnumerable().Where(r => !outputTable.AsEnumerable().Select(x
+                                => x["ID"]).ToList().Contains(r["ID"])).ToList()).Rows.Cast<DataRow>().Select(t => t[column.ColumnName]).Max();
+                            allPossibleSolutions.Add((object)maxValueExcludedInColumn);
+
+                        case "<":
+                            var minValueExcludedInColumn =
+                                (input.AsEnumerable().Where(r => !outputTable.AsEnumerable().Select(x
+                                => x["ID"]).ToList().Contains(r["ID"])).ToList()).Rows.Cast<DataRow>().Select(t => t[column.ColumnName]).Min();
+                            allPossibleSolutions.Add((object)minValueExcludedInColumn);
+
                         default:
                             // TODO: Unsupported datatype
                             break;
