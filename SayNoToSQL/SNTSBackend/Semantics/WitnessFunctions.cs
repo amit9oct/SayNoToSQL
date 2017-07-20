@@ -14,9 +14,8 @@ namespace SNTSBackend.Semantics
         public WitnessFunctions(Grammar grammar) : base(grammar) { }
 
         [WitnessFunction(nameof(Semantics.SelectWithoutWhere), 0)]
-        internal DisjunctiveExamplesSpec WitnessPositionPair(GrammarRule rule, ExampleSpec spec)
+        internal DisjunctiveExamplesSpec WitnessSelectWithoutWhere(GrammarRule rule, ExampleSpec spec) {
 
-        {
             var ppExamples = new Dictionary<State, IEnumerable<object>>();
 
             foreach (State input in spec.ProvidedInputs)

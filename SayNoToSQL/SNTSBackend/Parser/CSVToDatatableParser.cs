@@ -2,15 +2,13 @@
 using System.Data;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.VisualBasic.FileIO;
 
 namespace SNTSBackend.Parser
 {
-    class CSVToDatatableParser
+    public static class CSVToDatatableParser
     { 
-        public DataTable parse(String inputFile, Boolean headerPresent)
+        public static DataTable Parse(String inputFile, Boolean headerPresent = true)
         {
             DataTable table = new DataTable();
             List<DataColumn> cols = new List<DataColumn>();
@@ -34,23 +32,48 @@ namespace SNTSBackend.Parser
                 }
                 for(int i = 0; i < firstLine.Length; i++)
                 {
-                    Type type = detectType(firstLine[i]);
+                    Type type = DetectType(firstLine[i]);
                     cols.Add(new DataColumn(headers[i], type));
                 }
                 table.Columns.AddRange(cols.ToArray());
 
                 DataRow row = table.NewRow();
-                table.Rows.Add(createRow(row, headers, firstLine));
+                table.Rows.Add(CreateRow(row, headers, firstLine));
                 while (!parser.EndOfData)
                 {
                     string[] fields = parser.ReadFields();
                     row = table.NewRow();
-                    table.Rows.Add(createRow(row, headers, fields));
+                    table.Rows.Add(CreateRow(row, headers, fields));
                 }
             }
             return table;
         }
-        public Type detectType(String field)
+
+        public static void ShowTable(DataTable table)
+        {
+            foreach (DataColumn col in table.Columns)
+            {
+                Console.Write("{0,-14}", col.ColumnName);
+            }
+            Console.WriteLine();
+
+            foreach (DataRow row in table.Rows)
+            {
+                foreach (DataColumn col in table.Columns)
+                {
+                    if (col.DataType.Equals(typeof(DateTime)))
+                        Console.Write("{0,-14:d}", row[col]);
+                    else if (col.DataType.Equals(typeof(Decimal)))
+                        Console.Write("{0,-14:C}", row[col]);
+                    else
+                        Console.Write("{0,-14}", row[col]);
+                }
+                Console.WriteLine();
+            }
+            Console.WriteLine();
+        }
+
+        private static Type DetectType(String field)
         {
             Type type = typeof(String);
             Double res = 0;
@@ -60,7 +83,8 @@ namespace SNTSBackend.Parser
             }
             return type;
         }
-        public DataRow createRow(DataRow row, String[] headers, String[] fields)
+
+        private static DataRow CreateRow(DataRow row, String[] headers, String[] fields)
         {
             for(int i = 0; i < headers.Length; i++)
             {

@@ -1,17 +1,20 @@
-﻿using System.Collections.Generic;
+﻿#reference 'file:SNTSBackend.exe';
+#reference 'file:System.Data.dll';
+
+using System.Collections.Generic;
 using System.Data;
 
-using semantics ProseSample.Substrings.Semantics;
-using learners ProseSample.Substrings.WitnessFunctions;
+using semantics SNTSBackend.Semantics.Semantics;
+using learners SNTSBackend.Semantics.WitnessFunctions;
 
 language SayNoToSql;
 
 @start DataTable sql := select;
 
-DataTable select := SelectWithoutWhere(columnList,tableList) | SelectWithWhere(columnList,condition);
+DataTable select := SelectWithoutWhere(columnArray,tableArray) | SelectWithWhere(columnArray,condition);
 DataTable condition :=   cmpStatement  // This has one single the comparison statement 
         |Logical(cmpStatement, @recurse[5] condition, logicSymbol); // combining two comparison statements 
-DataTable cmpStatement = Comparator(column, tableList, cmpSymbol, constValue); // column.name [cmpSymbol] Const
+DataTable cmpStatement = Comparator(column, tableArray, cmpSymbol, constValue); // column.name [cmpSymbol] Const
 string cmpSymbol := ‘>’|’<’|’>=’|’<=’|’==’; 
 string logicSymbol := ‘AND’|’OR’;
 
