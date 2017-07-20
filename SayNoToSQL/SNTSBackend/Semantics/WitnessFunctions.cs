@@ -62,7 +62,7 @@ namespace SNTSBackend.Semantics
                 foreach (State input in spec.ProvidedInputs) {
 
                     DataTable inputTable = ((DataTable[])input[rule.Grammar.InputSymbol])[0];
-                    var desiredOutput = conditionTable;
+                    var desiredOutput = (DataTable)spec.DisjunctiveExamples[input].First(); // conditionTable;
                     var allPossibleSolutions = new List<object>();
                     allPossibleSolutions.Add(desiredOutput.Columns.Cast<DataColumn>().ToArray());
 
@@ -155,7 +155,8 @@ namespace SNTSBackend.Semantics
                         if (flag)
                         {
                             var countRowsInput = inputTable.Select(column.ColumnName + cmpSymbol + valueToCompare).Count();
-                            var countRowsOutput = inputTable.Select(column.ColumnName + cmpSymbol + valueToCompare).Count();
+                             var countRowsOutput = outputTable.Select(column.ColumnName + cmpSymbol + valueToCompare).Count();
+                            // var countRowsOutput = outputTable.Rows.Count; // This seems more correct
                             if (flag && countRowsInput == countRowsOutput)
                             {
                                 allPossibleSolutions.Add((object)valueToCompare);
@@ -213,7 +214,19 @@ namespace SNTSBackend.Semantics
                                 if (excludedRow1 != null && excludedRow1.Count() != 0) {
                                     valueToCompare = (double)
                                         ((excludedRow1).ToList()).Cast<DataRow>().Select(t => t[column.ColumnName]).Min();
+                                    if (valueToCompare <= 
+                                        (double)outputTable
+                                            .Rows.Cast<DataRow>()
+                                                 .Select(t => t[column.ColumnName]).Max()
+                                       )
+                                    {
+                                        flag = false;
+                                    }
+                                } else
+                                {
+                                    flag = false;
                                 }
+
                                 break;
                             }
                             case ">":
@@ -223,6 +236,17 @@ namespace SNTSBackend.Semantics
                             if (excludedRow !=null && excludedRow.Count() != 0) {
                                 valueToCompare = (double)
                                         (excludedRow.ToList()).Cast<DataRow>().Select(t => t[column.ColumnName]).Max();
+                                if (valueToCompare >=
+                                        (double)outputTable
+                                            .Rows.Cast<DataRow>()
+                                                 .Select(t => t[column.ColumnName]).Min()
+                                       )
+                                {
+                                    flag = false;
+                                }
+                            } else
+                            {
+                                flag = false;
                             }
                                 break;
                             case "!=":
@@ -256,6 +280,7 @@ namespace SNTSBackend.Semantics
                         {
                             var countRowsInput = inputTable.Select(column.ColumnName + mappedCmpSymbol + valueToCompare).Count();
                             var countRowsOutput = outputTable.Select(column.ColumnName + mappedCmpSymbol + valueToCompare).Count();
+                            // This seems more correct // var countRowsOutput = outputTable.Rows.Count;
                             if (flag && countRowsInput == countRowsOutput && (countRowsInput !=0 || outputTable.Rows.Count == 0))
                             {
                                 allPossibleSolutions.Add((object)valueToCompare);
