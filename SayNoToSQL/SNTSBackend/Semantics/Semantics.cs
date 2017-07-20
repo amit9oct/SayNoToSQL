@@ -22,8 +22,13 @@ namespace SNTSBackend.Semantics
         public static DataTable SelectWithoutWhere(DataColumn[] columnArray, DataTable[] tableArray) {
             var columnsInTable = tableArray.Select(t => t.Columns.Cast<DataColumn>().ToArray()).ToArray();
             var columnNamesDict = columnArray.ToDictionary(c => c.ColumnName, c => c);
+            if(!(columnNamesDict.ContainsKey("PrimaryKey")))
+            {
+                columnNamesDict.Add("PrimaryKey", tableArray[0].PrimaryKey[0]);
+            }
+            
             var displayTable = new DataTable();
-            var displayColums = new List<DataColumn>();
+            var displayColumns = new List<DataColumn>();
             foreach (var columns in columnsInTable) {
                 foreach (var column in columns) {
                     //Check the data type as well as the name of the column
@@ -32,14 +37,19 @@ namespace SNTSBackend.Semantics
                         var newColumn = new DataColumn(column.ColumnName);
                         newColumn.DataType = column.DataType;
                         displayTable.Columns.Add(newColumn);
-                        displayColums.Add(newColumn);
+                        displayColumns.Add(newColumn);
                     }
                 }
             }
+
+
             //Currently supports one table
+            //adding primary key to new table created
+            displayTable.PrimaryKey = new DataColumn[] { displayTable.Columns["PrimaryKey"] };
+
             foreach (DataRow row in tableArray[0].Rows) {
                 DataRow newRow = displayTable.NewRow();
-                foreach(var cols in displayColums) {
+                foreach(var cols in displayColumns) {
                     newRow[cols.ColumnName] = row[cols.ColumnName];
                 }
                 displayTable.Rows.Add(newRow);

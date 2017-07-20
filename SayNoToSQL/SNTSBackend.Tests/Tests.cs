@@ -11,7 +11,7 @@ namespace SNTSBackend.Tests
         [TestMethod]
         public void CsvToDataTableConversionTest() {
             DataTable table = CSVToDatatableParser.Parse(@"TestCases\Parser\Table.csv");
-            Debug.Assert(table.Columns.Count == 3);
+            Debug.Assert(table.Columns.Count == 4);
             Debug.Assert(table.Rows.Count == 5);
             Debug.Assert((string)table.Rows[2]["Name"] == "Amitayush");
             Debug.Assert((string)table.Rows[2]["Uni"] == "Pilani");

@@ -14,6 +14,7 @@ namespace SNTSBackend.Parser
             List<DataColumn> cols = new List<DataColumn>();
             using (TextFieldParser parser = new TextFieldParser(inputFile))
             {
+                int rowCount = 0;
                 parser.TextFieldType = FieldType.Delimited;
                 //hardcoded - should input
                 parser.SetDelimiters(",");
@@ -30,20 +31,24 @@ namespace SNTSBackend.Parser
                     firstLine = parser.ReadFields(); //read first line of values - to get length
                     headers = Enumerable.Range(0, firstLine.Length).Select(n => n.ToString()).ToArray();
                 }
-                for(int i = 0; i < firstLine.Length; i++)
+
+                cols.Add(new DataColumn("PrimaryKey", typeof(int)));
+                
+                for (int i = 0; i < firstLine.Length; i++)
                 {
                     Type type = DetectType(firstLine[i]);
                     cols.Add(new DataColumn(headers[i], type));
                 }
                 table.Columns.AddRange(cols.ToArray());
-
+                table.PrimaryKey = new DataColumn[] { table.Columns["PrimaryKey"]};
                 DataRow row = table.NewRow();
-                table.Rows.Add(CreateRow(row, headers, firstLine));
+                table.Rows.Add(CreateRow(row, rowCount, headers, firstLine));
                 while (!parser.EndOfData)
                 {
+                    rowCount++;
                     string[] fields = parser.ReadFields();
                     row = table.NewRow();
-                    table.Rows.Add(CreateRow(row, headers, fields));
+                    table.Rows.Add(CreateRow(row, rowCount, headers, fields));
                 }
             }
             return table;
@@ -84,8 +89,9 @@ namespace SNTSBackend.Parser
             return type;
         }
 
-        private static DataRow CreateRow(DataRow row, String[] headers, String[] fields)
+        private static DataRow CreateRow(DataRow row, int rowCount, String[] headers, String[] fields)
         {
+            row["PrimaryKey"] = rowCount;
             for(int i = 0; i < headers.Length; i++)
             {
                 row[headers[i]] = fields[i];
