@@ -61,6 +61,20 @@ namespace SNTSBackend.Tests
             Debug.Assert((string)desiredTable.Rows[1]["Uni"] == (string)transformedTable.Rows[1]["Uni"]);
             Debug.Assert((double)desiredTable.Rows[1]["Age"] == (double)transformedTable.Rows[1]["Age"]);
         }
+        [TestMethod]
+        public void LogicalTest()
+        {
+            DataTable table = CSVToDatatableParser.Parse(@"TestCases\Semantics\TableInput.csv");
+            DataColumn column = new DataColumn("Age", typeof(double));
+            DataTable firstTable = Semantics.Semantics.Comparator(column, new DataTable[] { table }, "==", 22);
+            column = new DataColumn("Uni", typeof(string));
+            DataTable secondTable = Semantics.Semantics.Comparator(column, new DataTable[] { table }, "==", "Pilani");
+            DataTable unionTable = Semantics.Semantics.Logical(firstTable, secondTable, "OR");
+            DataTable intersectTable = Semantics.Semantics.Logical(firstTable, secondTable, "AND");
+            Debug.Assert(unionTable.Rows.Count == 3);
+            Debug.Assert(intersectTable.Rows.Count == 1);
+
+        }
 
         [TestMethod]
         public void SelectWithoutWhereSynthesisTest() {

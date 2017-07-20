@@ -53,9 +53,28 @@ namespace SNTSBackend.Semantics
             return outputTable;
         }
 
+        public static DataTable Logical(DataTable cmpStatement, DataTable condition, string logicSymbol)
+        {
+            IEnumerable<DataRow> rows;
+            switch(logicSymbol)
+            {
+                case "AND":
+                    rows = cmpStatement.AsEnumerable().Intersect(condition.AsEnumerable(), new DataTableCustomComparator());
+                    break;
+                case "OR":
+                    rows = cmpStatement.AsEnumerable().Union(condition.AsEnumerable(), new DataTableCustomComparator());
+                    break;
+                default:
+                    rows = null;
+                    break;
+
+            }
+            return CreateOutputTableFromEnumerable(rows);
+        }
+
     public static DataTable Comparator(DataColumn column,DataTable[] tableList,string cmpSymbol,object constValue){
             // Picks a value from the set of values present in the column
-            var outputTable = new DataTable();
+            DataRow[] rows;
             DataTable table = tableList[0];
             string mappedCompSymbol;
             switch (cmpSymbol)
@@ -68,16 +87,38 @@ namespace SNTSBackend.Semantics
                     break;
             }
             if (column.DataType == typeof(double))
-            {   
-                outputTable = table.Select(column.ColumnName + mappedCompSymbol + constValue.ToString()).CopyToDataTable();
+            {
+                rows = table.Select(column.ColumnName + mappedCompSymbol + constValue.ToString());
             }
             else
             {
-                outputTable = table.Select(column.ColumnName + mappedCompSymbol + constValue.ToString()).CopyToDataTable();
+                rows = table.Select(column.ColumnName + mappedCompSymbol + "'" + constValue.ToString() + "'");
             }
-            return outputTable;
+            return CreateOutputTableFromRows(rows);
         }
-    }
+        public static DataTable CreateOutputTableFromRows(DataRow[] rows)
+        {
+            if(rows == null || rows.Length == 0)
+            {
+                return new DataTable();
+            }
+            else
+            {
+                return rows.CopyToDataTable();
+            }
+        }
+        public static DataTable CreateOutputTableFromEnumerable(IEnumerable<DataRow> rows)
+        {
+            if (rows == null || rows.Count() == 0)
+            { 
+                return new DataTable();
+            }
+            else
+            {
+                return rows.CopyToDataTable();
+            }
+        } 
+    } 
     
 
 }

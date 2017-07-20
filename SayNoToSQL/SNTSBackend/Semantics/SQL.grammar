@@ -13,8 +13,8 @@ language SayNoToSql;
 
 DataTable select := SelectWithoutWhere(columnArray,tableArray) 
                   | SelectWithWhere(columnArray,condition);
-DataTable condition := cmpStatement ;
-//                  | Logical(cmpStatement, condition, logicSymbol); // combining two comparison statements 
+DataTable condition := cmpStatement 
+                  | Logical(cmpStatement,@recurse[5] condition, logicSymbol); // combining two comparison statements 
 DataTable cmpStatement := Comparator(column, tableArray, cmpSymbol, constValue); // column.name [cmpSymbol] Const
 
 string cmpSymbol := GetCmpSymbol(i); 
