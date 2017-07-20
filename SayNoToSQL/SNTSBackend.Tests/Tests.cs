@@ -73,6 +73,19 @@ namespace SNTSBackend.Tests
             Debug.Assert((string)outputLearnt.Rows[4]["Name"] == (string)outputTable.Rows[4]["Name"]);
             Debug.Assert((string)outputLearnt.Rows[4]["Uni"] == (string)outputTable.Rows[4]["Uni"]);
         }
+
+        [TestMethod]
+        public void SelectWithWhereSynthesisTest()
+        {
+            DataTable inputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithoutWhere-Input.csv");
+            DataTable outputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithoutWhere-Output.csv");
+            var programNode = Learner.Instance.LearnSQL(inputTable, outputTable);
+            DataTable outputLearnt = Learner.Instance.Invoke(programNode, inputTable);
+            Debug.Assert(outputLearnt.Columns.Count == outputTable.Columns.Count);
+            Debug.Assert(outputLearnt.Rows.Count == outputTable.Rows.Count);
+            Debug.Assert((string)outputLearnt.Rows[0]["Name"] == (string)outputTable.Rows[0]["Name"]);
+            Debug.Assert((string)outputLearnt.Rows[1]["Name"] == (string)outputTable.Rows[1]["Name"]);
+        }
     }
 
 }
