@@ -7,6 +7,18 @@ using System.Linq;
 namespace SNTSBackend.Semantics
 {
     public static class Semantics {
+        public static string[] CmpGen = { "<=", ">=", "==", "!=", "<", ">" };
+
+        public static string[] LogicGen = { "AND", "OR" };
+
+        public static string GetCmpSymbol(int index) {
+            return CmpGen[index];
+        }
+
+        public static string GetLogicSymbol(int index) {
+            return LogicGen[index];
+        }
+
         public static DataTable SelectWithoutWhere(DataColumn[] columnArray, DataTable[] tableArray) {
             var columnsInTable = tableArray.Select(t => t.Columns.Cast<DataColumn>().ToArray()).ToArray();
             var columnNamesDict = columnArray.ToDictionary(c => c.ColumnName, c => c);
@@ -38,18 +50,22 @@ namespace SNTSBackend.Semantics
         public static DataTable SelectWithWhere(DataColumn[] columnArray, DataTable table)
         {
             var columnsInTable = table.Columns.Cast<DataColumn>().ToArray();
-            HashSet<DataColumn> columnArrayHash = new HashSet<DataColumn>();
-            columnArray.Select(c => columnArrayHash.Add(c));
+            var columnNamesDict = columnArray.ToDictionary(c => c.ColumnName, c => c);
             var displayTable = new DataTable();
             var displayColums = new List<DataColumn>();
             foreach (var column in columnsInTable)
             {
-                    if (columnArrayHash.Contains(column))
+                    //Check the data type as well as the name of the column
+                    if (columnNamesDict.ContainsKey(column.ColumnName) &&
+                        columnNamesDict[column.ColumnName].DataType == column.DataType)
                     {
-                        displayTable.Columns.Add(column);
-                        displayColums.Add(column);
+                        var newColumn = new DataColumn(column.ColumnName);
+                        newColumn.DataType = column.DataType;
+                        displayTable.Columns.Add(newColumn);
+                        displayColums.Add(newColumn);
                     }
             }
+            //Currently supports one table
             foreach (DataRow row in table.Rows)
             {
                 DataRow newRow = displayTable.NewRow();
@@ -61,13 +77,15 @@ namespace SNTSBackend.Semantics
             }
             return displayTable;
         }
-
+        //public static DataTable Comparator(DataColumn column, DataTable[] tableList, string cmpSymbol) {
+        //    return new DataTable();
+        //}
         //public static DataTable Logical(DataTable cmpStatement, @recurse[5] condition, logicSymbol)
 
-        public static DataTable Comparator(DataColumn column,DataTable tableList,string cmpSymbol,object constValue){
+    public static DataTable Comparator(DataColumn column,DataTable[] tableList,string cmpSymbol,object constValue){
             // Picks a value from the set of values present in the column
             var outputTable = new DataTable();
-            DataTable table = tableList;//[0];
+            DataTable table = tableList[0];
             string mappedCompSymbol;
             switch (cmpSymbol)
             {
@@ -81,50 +99,12 @@ namespace SNTSBackend.Semantics
             if (column.DataType == typeof(double))
             {   // Krishnan does not know C# but wrote this anyway
                 outputTable = table.Select(column.ColumnName + mappedCompSymbol + constValue.ToString()).CopyToDataTable();
-            }else
+            }
+            else
             {
                 outputTable = table.Select(column.ColumnName + mappedCompSymbol + constValue.ToString()).CopyToDataTable();
             }
-            ShowTable(outputTable);
             return outputTable;
-                /*
-                switch (cmpSymbol)
-                {
-                    case "==":;
-                        break;
-                    case "<=":;
-                        break;
-                    case ">=":
-                        table.Select(column.ColumnName + ">=" + constValue.ToString());
-                        break;
-                    //case ">": break;
-                    //case "<": break;
-                    //case "!=": break;
-
-                }*/
-            }
-        private static void ShowTable(DataTable table)
-        {
-            foreach (DataColumn col in table.Columns)
-            {
-                Console.Write("{0,-14}", col.ColumnName);
-            }
-            Console.WriteLine();
-
-            foreach (DataRow row in table.Rows)
-            {
-                foreach (DataColumn col in table.Columns)
-                {
-                    if (col.DataType.Equals(typeof(DateTime)))
-                        Console.Write("{0,-14:d}", row[col]);
-                    else if (col.DataType.Equals(typeof(Decimal)))
-                        Console.Write("{0,-14:C}", row[col]);
-                    else
-                        Console.Write("{0,-14}", row[col]);
-                }
-                Console.WriteLine();
-            }
-            Console.WriteLine();
         }
     }
     
