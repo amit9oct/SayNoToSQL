@@ -19,6 +19,15 @@ namespace SNTSBackend.Tests
         }
 
         [TestMethod]
+        public void CsvToDataTableConversionOutputTest()
+        {
+            DataTable table = CSVToDatatableParser.Parse(@"TestCases\Parser\Table.csv");
+            DataTable outputTable = CSVToDatatableParser.Parse(@"TestCases\Parser\TableOutput.csv", table);
+            //Debug.Assert(table.Rows[2][0] == outputTable.Rows[1][0]);
+            
+        }
+
+        [TestMethod]
         public void SelectWithoutWhereTest() {
             DataTable table = CSVToDatatableParser.Parse(@"TestCases\Semantics\TableInput.csv");
             DataColumn[] columns = {
