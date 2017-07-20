@@ -154,8 +154,8 @@ namespace SNTSBackend.Semantics
                         }
                         if (flag)
                         {
-                            var countRowsInput = inputTable.Select(column.ColumnName + cmpSymbol + valueToCompare).Count();
-                             var countRowsOutput = outputTable.Select(column.ColumnName + cmpSymbol + valueToCompare).Count();
+                            var countRowsInput = inputTable.Select(column.ColumnName + mappedCmpSymbol + "'" + valueToCompare + "'").Count();
+                             var countRowsOutput = outputTable.Select(column.ColumnName + mappedCmpSymbol + "'" + valueToCompare + "'").Count();
                             // var countRowsOutput = outputTable.Rows.Count; // This seems more correct
                             if (flag && countRowsInput == countRowsOutput)
                             {
