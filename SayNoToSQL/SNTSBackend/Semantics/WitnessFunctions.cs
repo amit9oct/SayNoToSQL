@@ -69,7 +69,9 @@ namespace SNTSBackend.Semantics
                     ppExamples[input] = allPossibleSolutions;
 
                 }
-
+            //Complete the rows
+            return DisjunctiveExamplesSpec.From(ppExamples);
+        }
         /*public static DataTable Logical(DataTable cmpStatement, DataTable condition, string logicSymbol)*/
         [WitnessFunction(nameof(Semantics.Logical), 2)]
         internal DisjunctiveExamplesSpec WitnessLogicalSymbol(GrammarRule rule, ExampleSpec spec)
@@ -87,9 +89,7 @@ namespace SNTSBackend.Semantics
         internal DisjunctiveExamplesSpec WitnessInputTable1(GrammarRule rule, DisjunctiveExamplesSpec spec, ExampleSpec logicalOperatorSpec)
         {
             var ppExamples = new Dictionary<State, IEnumerable<object>>();
-
-                return DisjunctiveExamplesSpec.From(ppExamples);
-
+            
             foreach (State input in spec.ProvidedInputs)
             {
                 DataTable outputTable = (DataTable)spec.DisjunctiveExamples[input].First();
@@ -195,11 +195,6 @@ namespace SNTSBackend.Semantics
             }
             return allPossibleSolutions;
         }
-
-
-    } // End class
-}
-            }
 
             /* Inverse for :
              *  Comparator(DataColumn column, DataTable tableList, string cmpSymbol, object constValue)

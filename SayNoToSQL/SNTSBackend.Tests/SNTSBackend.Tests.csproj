@@ -267,10 +267,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="TestCases\Synthesis\SelectWithWhere\SWW-LessEqual-Output.csv">
-    <EmbeddedResource Include="TestCases\Synthesis\SelectWithWhere1-Input.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TestCases\Synthesis\SelectWithWhere1-Output.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="TestCases\Synthesis\WithLogic-Output.csv">
