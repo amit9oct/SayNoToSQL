@@ -100,5 +100,54 @@ namespace SNTSBackend.Utils
             return c1.Equals(c2);
         }
 
+        public static void ShowTable(DataTable table)
+        {
+            foreach (DataColumn col in table.Columns)
+            {
+                Console.Write("{0,-14}", col.ColumnName);
+            }
+            Console.WriteLine();
+
+            foreach (DataRow row in table.Rows)
+            {
+                foreach (DataColumn col in table.Columns)
+                {
+                    if (col.DataType.Equals(typeof(DateTime)))
+                        Console.Write("{0,-14:d}", row[col]);
+                    else if (col.DataType.Equals(typeof(Decimal)))
+                        Console.Write("{0,-14:C}", row[col]);
+                    else
+                        Console.Write("{0,-14}", row[col]);
+                }
+                Console.WriteLine();
+            }
+            Console.WriteLine();
+        }
+        public static ProgramNode GetBestProgram(ProgramNode[] generatedPrograms, DataTable initialTable)
+        {
+            int count = Int32.MaxValue;
+            int tempCount = 0;
+            ProgramNode selectedProgramNode = generatedPrograms[0];
+            foreach (var programNode in generatedPrograms)
+            {
+                DataTable temp = Learner.Instance.Invoke(programNode, initialTable);
+
+                if (count > programNode.ToString().Replace("==", "=").Replace(">=", "=").Replace("<=", "=").Length)
+                {
+                    Console.WriteLine(programNode.ToString());
+                    if (temp.Rows.Count > tempCount)
+                    {
+                        count = programNode.ToString().Length;
+                        selectedProgramNode = programNode;
+                    }
+                    tempCount = temp.Rows.Count;
+
+                }
+            }
+            return selectedProgramNode;
+
+        }
+
+
     }
 }

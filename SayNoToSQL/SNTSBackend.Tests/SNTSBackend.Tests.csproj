@@ -281,6 +281,18 @@
     <EmbeddedResource Include="TestCases\Synthesis\SelectWithWhere\SWW-NotEqual-Input.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="TestCases\Synthesis\WithLogic-LargeInput.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestCases\Synthesis\WithLogic-LargeInputLarge.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestCases\Synthesis\WithLogic-InputLarge.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestCases\Synthesis\WithLogic-OutputLarge.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SNTSBackend\SNTSBackend.csproj">
