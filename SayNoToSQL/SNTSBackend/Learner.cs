@@ -37,19 +37,22 @@ namespace SNTSBackend
             engine.Configuration.LogListener.SaveLogToXML("learning.log.xml");
 
             //See if there is a ranking function.
-            if (scorer != null) { 
+            if (scorer != null)
+            {
                 //If there is a ranking function then find the best program.
-                ProgramNode bestProgram = consistentPrograms.TopK(scorer).FirstOrDefault();
-                if (bestProgram == null)
+                int nProgs = consistentPrograms.AllElements.Count();
+                if (nProgs > 10)
                 {
-                    Utils.Utils.WriteColored(ConsoleColor.Red, "No program :(");
-                    return null;
+                    nProgs = 10;
                 }
-                var score = bestProgram.GetFeatureValue(scorer);
-                Utils.Utils.WriteColored(ConsoleColor.Cyan, $"[score = {score:F3}] {bestProgram}");
-                return new ProgramNode[] { bestProgram };
+                return consistentPrograms.TopK(scorer, k: nProgs).ToArray();
+                
+
             }
-            return consistentPrograms.AllElements.ToArray();
+            else
+            {
+                return consistentPrograms.AllElements.ToArray();
+            }
         }
 
         public ProgramNode LearnSQL(DataTable inputTable, DataTable outputTable) {

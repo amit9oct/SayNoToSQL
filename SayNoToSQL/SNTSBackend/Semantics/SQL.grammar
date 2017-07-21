@@ -3,11 +3,13 @@
 
 using System.Collections.Generic;
 using System.Data;
+using SNTSBackend.Semantics;
 
 using semantics SNTSBackend.Semantics.Semantics;
 using learners SNTSBackend.Semantics.WitnessFunctions;
 
 language SayNoToSql;
+@complete feature double RankingScore = RankingScore;
 
 @start DataTable sql := select;
 
@@ -26,4 +28,3 @@ DataColumn[] columnArray;
 DataColumn column;
 object constValue;
 
-@complete feature double RankingScore = Semantics.RankingScore;
