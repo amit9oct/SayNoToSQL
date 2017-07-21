@@ -18,9 +18,10 @@ namespace SNTSBackend
         public Grammar Grammar { get; }
 
         public static Learner Instance = new Learner();
-
+        public Semantics.RankingScore staticScorer;
         private Learner() {
             Grammar = Utils.Utils.LoadGrammar(@"Semantics\SQL.grammar");
+            staticScorer = new Semantics.RankingScore(Grammar);
         }
 
         private ProgramNode[] LearnAll(Spec spec, Feature<double> scorer, DomainLearningLogic witnessFunctions) {
@@ -53,14 +54,14 @@ namespace SNTSBackend
 
         public ProgramNode LearnSQL(DataTable inputTable, DataTable outputTable) {
             var spec = SpecFromStateOutput(inputTable, outputTable);
-            var programNode = LearnAll(spec, null, new Semantics.WitnessFunctions(Grammar));
+            var programNode = LearnAll(spec, staticScorer, new Semantics.WitnessFunctions(Grammar));
             return programNode.First();
         }
 
         public ProgramNode[] LearnSQLAll(DataTable inputTable, DataTable outputTable)
         {
             var spec = SpecFromStateOutput(inputTable, outputTable);
-            return LearnAll(spec, null, new Semantics.WitnessFunctions(Grammar));
+            return LearnAll(spec, staticScorer, new Semantics.WitnessFunctions(Grammar));
         }
 
         public DataTable Invoke(ProgramNode programNode, DataTable inputTable) {

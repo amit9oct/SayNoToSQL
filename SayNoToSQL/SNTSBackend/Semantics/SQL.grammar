@@ -24,5 +24,6 @@ string logicSymbol;
 @input DataTable[] tableArray;
 DataColumn[] columnArray;
 DataColumn column;
-int i;
 object constValue;
+
+@complete feature double RankingScore = Semantics.RankingScore;
