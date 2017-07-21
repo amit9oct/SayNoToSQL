@@ -224,10 +224,29 @@
     <Compile Include="Semantics\DataTableCustomComparator.cs" />
     <Compile Include="Semantics\Semantics.cs" />
     <Compile Include="Semantics\WitnessFunctions.cs" />
+    <Compile Include="Utils\CommandLineParser.cs" />
     <Compile Include="Utils\Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <EmbeddedResource Include="Inputs\WithLogic-Input.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Inputs\WithLogic-LargeInput.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Inputs\WithLogic-Output.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Inputs\WithLogic-OutputLarge.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Inputs\WithLogic-LargeInputLarge.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Inputs\WithLogic-InputLarge.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <None Include="packages.config" />
     <EmbeddedResource Include="Semantics\SQL.grammar">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
