@@ -21,7 +21,7 @@ namespace SNTSBackend.Utils
             if (compilationResult.HasErrors)
             {
                 WriteColored(ConsoleColor.Magenta, compilationResult.TraceDiagnostics);
-                throw new Exception("Grammar file has compilation errors!!");
+                throw new Exception(compilationResult.Exception.InnerException.Message);
             }
             if (compilationResult.Diagnostics.Count > 0)
             {
@@ -51,7 +51,7 @@ namespace SNTSBackend.Utils
                 // Power set contains 2^N subsets.
                 int powerSetCount = 1 << n;
 
-                for (int setMask = 0; setMask < powerSetCount; setMask++)
+                for (int setMask = 1; setMask < powerSetCount; setMask++)
                 {
                     DataTable outputTable = table.Clone();
                     for (int i = 0; i < n; i++)
@@ -67,5 +67,38 @@ namespace SNTSBackend.Utils
             }
             return outputTables.ToArray();
         }
+
+        public static DataTable CreateOutputTableFromRows(DataRow[] rows)
+        {
+            if (rows == null || rows.Length == 0)
+            {
+                return new DataTable();
+            }
+            else
+            {
+                return rows.CopyToDataTable();
+            }
+        }
+        public static DataTable CreateOutputTableFromEnumerable(IEnumerable<DataRow> rows)
+        {
+            if (rows == null || rows.Count() == 0)
+            {
+                return new DataTable();
+            }
+            else
+            {
+                return rows.CopyToDataTable();
+            }
+        }
+
+        public static bool EqualColumns(DataTable t1, DataTable t2, string columnName)
+        {
+            var c1= t1.AsEnumerable().Select(r => r.Field< object >(columnName)).ToList();
+            c1.Sort();
+            var c2 = t2.AsEnumerable().Select(r => r.Field<object>(columnName)).ToList();
+            c2.Sort();
+            return c1.Equals(c2);
+        }
+
     }
 }

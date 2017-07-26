@@ -1,0 +1,41 @@
+﻿
+@{
+    ViewBag.Title = "FileUpload";
+}
+
+<h2>Upload Input-Output Files</h2>
+
+@using (@Html.BeginForm("Upload", "FileUpload", FormMethod.Post, new { @id = "form1", @enctype = "multipart/form-data" }))
+{
+
+    <table>
+        <tr>
+            <td>
+                <label>
+                    Enter the input file
+                </label>
+            </td>
+            <td>
+                <input type="file" name="input_file" placeholder="Enter the input file" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>
+                    Enter the output file
+                </label>
+            </td>
+            <td>
+                <input type="file" name="output_file" placeholder="Enter the output file" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="submit" id="bttn_Upload" value="Upload" />
+            </td>
+            <td>
+                *@ViewBag.Message
+            </td>
+        </tr>
+    </table>
+}
