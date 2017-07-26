@@ -37,8 +37,10 @@ namespace SayNoToSQL.Controllers
                 var outputTable = OpenFile(Path.GetFileName(output_file.FileName),inputTable);
                 try
                 {
-                    Directory.SetCurrentDirectory(Server.MapPath("~/bin/"));
-                    SNTSBackend.Learner.Instance.SetGrammar(Server.MapPath("~/App_Data/Grammar/SQL.grammar"));
+                    if (SNTSBackend.Learner.GrammarNotCompiled) {
+                        Directory.SetCurrentDirectory(Server.MapPath("~/bin/"));
+                        SNTSBackend.Learner.Instance.SetGrammar(Server.MapPath("~/App_Data/Grammar/SQL.grammar"));
+                    }
                     var allProgramNodes = SNTSBackend.Learner.Instance.LearnSQLAll(inputTable, outputTable);
                     ViewBag.AllProgramNodes = allProgramNodes;
                 }

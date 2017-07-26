@@ -17,16 +17,19 @@ namespace SNTSBackend
 {
     public class Learner {
         public Grammar Grammar { get; private set; }
-
+        public static bool GrammarNotCompiled = true;
         public void SetGrammar(string filename) {
             Grammar = Utils.Utils.LoadGrammar(filename);
+            Learner.GrammarNotCompiled = false;
         }
 
         public static Learner Instance = new Learner();
 
         private Learner() {
-           if(File.Exists(@"Semantics\SQL.grammar"))
+            if (File.Exists(@"Semantics\SQL.grammar")) {
                 Grammar = Utils.Utils.LoadGrammar(@"Semantics\SQL.grammar");
+                Learner.GrammarNotCompiled = false;
+            }
         }
 
         private ProgramNode[] LearnAll(Spec spec, Feature<double> scorer, DomainLearningLogic witnessFunctions) {
