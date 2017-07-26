@@ -1,0 +1,68 @@
+﻿
+@{
+    ViewBag.Title = "FileUpload";
+}
+
+<h2>Tables</h2>
+
+@using (@Html.BeginForm("Upload", "FileUpload", FormMethod.Post, new { @id = "form1", @enctype = "multipart/form-data" }))
+{
+
+    <table>
+        <tr>
+            <td>
+                <input type="file" name="input_file" placeholder="Enter the input file"/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="file" name="output_file" placeholder="Enter the output file"/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="submit" id="bttn_Upload" value="Upload Output File" />
+            </td>
+            <td>
+                *@ViewBag.Message
+            </td>
+        </tr>
+    </table>
+}
+<h2>Input</h2>
+<div id="input-table-container"></div>
+<h2>Output</h2>
+<div id="output-table-container"></div>
+
+<h3>SQL Queries</h3>
+@foreach(var programNode in ViewBag.AllProgramNodes)
+{
+    <p>@programNode.ToString()</p>
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        function format_link(link) {
+            if (link)
+                return "<a href='" + link + "' target='_blank'>" + link + "</a>";
+            else
+                return "";
+        }
+        CsvToHtmlTable.init({
+            csv_path: '/FileUpload/GetAttachment/?file_name=@ViewBag.InputFile',
+            element: 'input-table-container',
+            allow_download: true,
+            csv_options: { separator: ',', delimiter: '"' },
+            datatables_options: { "paging": false },
+            custom_formatting: [[1, format_link]]
+        });
+        CsvToHtmlTable.init({
+            csv_path: '/FileUpload/GetAttachment/?file_name=@ViewBag.OutputFile',
+            element: 'output-table-container',
+            allow_download: true,
+            csv_options: { separator: ',', delimiter: '"' },
+            datatables_options: { "paging": false },
+            custom_formatting: [[1, format_link]]
+        });
+     }
+    );
+</script>

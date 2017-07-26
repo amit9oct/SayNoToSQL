@@ -21,7 +21,7 @@ namespace SNTSBackend.Utils
             if (compilationResult.HasErrors)
             {
                 WriteColored(ConsoleColor.Magenta, compilationResult.TraceDiagnostics);
-                throw new Exception("Grammar file has compilation errors!!");
+                throw new Exception(compilationResult.Exception.InnerException.Message);
             }
             if (compilationResult.Diagnostics.Count > 0)
             {

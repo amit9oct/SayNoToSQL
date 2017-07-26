@@ -8,6 +8,7 @@ using Microsoft.ProgramSynthesis.VersionSpace;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,12 +16,17 @@ using System.Threading.Tasks;
 namespace SNTSBackend
 {
     public class Learner {
-        public Grammar Grammar { get; }
+        public Grammar Grammar { get; private set; }
+
+        public void SetGrammar(string filename) {
+            Grammar = Utils.Utils.LoadGrammar(filename);
+        }
 
         public static Learner Instance = new Learner();
 
         private Learner() {
-            Grammar = Utils.Utils.LoadGrammar(@"Semantics\SQL.grammar");
+           if(File.Exists(@"Semantics\SQL.grammar"))
+                Grammar = Utils.Utils.LoadGrammar(@"Semantics\SQL.grammar");
         }
 
         private ProgramNode[] LearnAll(Spec spec, Feature<double> scorer, DomainLearningLogic witnessFunctions) {
