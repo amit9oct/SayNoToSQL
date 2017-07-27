@@ -1,0 +1,32 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+</head>
+<body>
+    <div id="input-table-container">
+      Loading The Output Table ....
+    </div>
+    <script type="text/javascript">
+    $(document).ready(function () {
+        function format_link(link) {
+            if (link)
+                return "<a href='" + link + "' target='_blank'>" + link + "</a>";
+            else
+                return "";
+        }
+        CsvToHtmlTable.init({
+            csv_path: '/FileUpload/GetAttachment/?file_name=@ViewBag.InputFile',
+            element: 'input-table-container',
+            allow_download: true,
+            csv_options: { separator: ',', delimiter: '"' },
+            datatables_options: { "paging": false },
+            custom_formatting: [[1, format_link]]
+        });
+     }
+    );
+    </script>
+</body>
+</html>

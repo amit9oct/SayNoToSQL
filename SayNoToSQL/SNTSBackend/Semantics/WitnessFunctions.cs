@@ -35,7 +35,30 @@ namespace SNTSBackend.Semantics
 
             }
 
-            [WitnessFunction(nameof(Semantics.SelectWithWhere), 1)]
+        [WitnessFunction(nameof(Semantics.SelectWithoutWhere), 2)]
+        [WitnessFunction(nameof(Semantics.SelectWithWhere), 2)]
+        internal DisjunctiveExamplesSpec WitnessSelectWithoutWhereTableNames(GrammarRule rule, ExampleSpec spec)
+        {
+
+            var ppExamples = new Dictionary<State, IEnumerable<object>>();
+
+            foreach (State input in spec.ProvidedInputs)
+            {
+
+                var tableList = (DataTable[])input[rule.Grammar.InputSymbol];
+                var inputTable = tableList[0];
+                var allPossibleSolutions = new List<object>(); 
+                allPossibleSolutions.Add(new[] { inputTable.TableName });
+                ppExamples[input] = allPossibleSolutions;
+
+            }
+
+            return DisjunctiveExamplesSpec.From(ppExamples);
+
+        }
+
+
+        [WitnessFunction(nameof(Semantics.SelectWithWhere), 1)]
             internal DisjunctiveExamplesSpec WitnessSelectWithWhereCondition(GrammarRule rule, ExampleSpec spec) {
                 var ppExamples = new Dictionary<State, IEnumerable<object>>();
                 foreach(State input in spec.ProvidedInputs) {
