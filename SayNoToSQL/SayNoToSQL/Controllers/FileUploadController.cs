@@ -67,7 +67,7 @@ namespace SayNoToSQL.Controllers
                             ProgramNode = pNode,
                             HumanReadable = SNTSBackend.Learner.Instance.Query(pNode),
                             Idx = idx,
-                            LargeFile = $"out_{idx}_{large_file.FileName}"
+                            LargeFile = $"out_{idx}_{Path.GetFileName(large_file.FileName)}"
                         });
                         idx++;
                     }
