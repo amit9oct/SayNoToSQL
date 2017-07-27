@@ -57,7 +57,7 @@ namespace SayNoToSQL.Controllers
                         Directory.SetCurrentDirectory(Server.MapPath("~/bin/"));
                         SNTSBackend.Learner.Instance.SetGrammar(Server.MapPath("~/App_Data/Grammar/SQL.grammar"));
                     }
-                    var allProgramNodes = SNTSBackend.Learner.Instance.LearnSQLAll(inputTable, outputTable);
+                    var allProgramNodes = SNTSBackend.Learner.Instance.LearnSQLTopK(inputTable, outputTable, 10).Take(10).ToArray();
                     var prog = allProgramNodes.First();
                     var ser = prog.PrintAST();
                     var idx = 0;

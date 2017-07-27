@@ -90,7 +90,7 @@ namespace SNTSBackend.Tests
         public void SelectWithoutWhereSynthesisTest() {
             DataTable inputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithoutWhere-Input.csv");
             DataTable outputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithoutWhere-Output.csv", inputTable);
-            var generatedPrograms = Learner.Instance.LearnSQLAll(inputTable, outputTable);
+            var generatedPrograms = Learner.Instance.LearnSQLTopK(inputTable, outputTable,10);
 
             Debug.Assert(generatedPrograms.Length >= 1);
             foreach (var programNode in generatedPrograms)
@@ -109,9 +109,11 @@ namespace SNTSBackend.Tests
             DataTable outputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithWhere-Output.csv", inputTable);
             var generatedPrograms = Learner.Instance.LearnSQLAll(inputTable, outputTable);
 
+
             Debug.Assert(generatedPrograms.Length >= 1);
             foreach (var programNode in generatedPrograms)
             {
+                Console.Write(programNode + " = " + programNode.GetFeatureValue(Learner.Instance.QueryRanker));
                 DataTable outputLearnt = Learner.Instance.Invoke(programNode, inputTable);
                 Debug.Assert(outputLearnt.Columns.Count == outputTable.Columns.Count);
                 Debug.Assert(outputLearnt.Rows.Count == outputTable.Rows.Count);
@@ -167,7 +169,7 @@ namespace SNTSBackend.Tests
         {
             DataTable inputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithWhere\SWW-NotEqual-Input.csv");
             DataTable outputTable = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithWhere\SWW-NotEqual-Output.csv", inputTable);
-            var generatedPrograms = Learner.Instance.LearnSQLAll(inputTable, outputTable);
+            var generatedPrograms = Learner.Instance.LearnSQLTopK(inputTable, outputTable, 10);
 
             Debug.Assert(generatedPrograms.Length >= 1);
             foreach (var programNode in generatedPrograms)

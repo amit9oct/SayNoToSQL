@@ -6,8 +6,11 @@ using System.Data;
 
 using semantics SNTSBackend.Semantics.Semantics;
 using learners SNTSBackend.Semantics.WitnessFunctions;
+using SNTSBackend.Semantics;
+
 
 language SayNoToSql;
+@complete feature double RankingScore = RankingScore;
 
 @start DataTable sql := select;
 
@@ -24,5 +27,5 @@ string[] tableNames;
 @input DataTable[] tableArray;
 DataColumn[] columnArray;
 DataColumn column;
-int i;
 object constValue;
+

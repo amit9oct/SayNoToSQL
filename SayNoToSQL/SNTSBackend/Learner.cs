@@ -23,6 +23,7 @@ namespace SNTSBackend
         public Dictionary<string, ProgramNode> ProgramNodeDict { get; private set; }
         public void SetGrammar(string filename) {
             Grammar = Utils.Utils.LoadGrammar(filename);
+            QueryRanker = new Semantics.RankingScore(Grammar);
             Learner.GrammarNotCompiled = false;
         }
         private static Learner _instance = null;
@@ -41,16 +42,22 @@ namespace SNTSBackend
             }
         }
 
+        public Semantics.RankingScore QueryRanker;
         private Learner() {
+            QueryRanker = null;
             if (File.Exists(@"Semantics\SQL.grammar"))
             {
                 Grammar = Utils.Utils.LoadGrammar(@"Semantics\SQL.grammar");
+                Learner.GrammarNotCompiled = false;
             }
+            QueryRanker = new Semantics.RankingScore(Grammar);
             ProgramNodeDict = new Dictionary<string, ProgramNode>();
         }
 
-        private ProgramNode[] LearnAll(Spec spec, Feature<double> scorer, DomainLearningLogic witnessFunctions) {
-            var engine = new SynthesisEngine(Grammar, new SynthesisEngine.Config {
+        private ProgramSet LearnProgramSet(Spec spec, DomainLearningLogic witnessFunctions)
+        {
+            var engine = new SynthesisEngine(Grammar, new SynthesisEngine.Config
+            {
                 Strategies = new ISynthesisStrategy[] {
                     new EnumerativeSynthesis(),
                     new DeductiveSynthesis(witnessFunctions)
@@ -60,9 +67,15 @@ namespace SNTSBackend
             });
             ProgramSet consistentPrograms = engine.LearnGrammar(spec);
             engine.Configuration.LogListener.SaveLogToXML("learning.log.xml");
+            return consistentPrograms;
+        }
 
+        private ProgramNode[] LearnAll(Spec spec, Feature<double> scorer, DomainLearningLogic witnessFunctions)
+        {
             //See if there is a ranking function.
-            if (scorer != null) { 
+            ProgramSet consistentPrograms = LearnProgramSet(spec, witnessFunctions);
+            if (scorer != null)
+            {
                 //If there is a ranking function then find the best program.
                 ProgramNode bestProgram = consistentPrograms.TopK(scorer).FirstOrDefault();
                 if (bestProgram == null)
@@ -77,16 +90,25 @@ namespace SNTSBackend
             return consistentPrograms.AllElements.ToArray();
         }
 
+        public ProgramNode[] LearnSQLTopK(DataTable inputTable, DataTable outputTable, int k)
+        {
+            var spec = SpecFromStateOutput(inputTable, outputTable);
+            ProgramSet consistentPrograms = LearnProgramSet(spec, new Semantics.WitnessFunctions(Grammar));
+            int nProgs = consistentPrograms.AllElements.ToArray().Length;
+            k = (nProgs < k) ? nProgs : k;
+            return consistentPrograms.TopK(QueryRanker, k).ToArray();
+        }
+
         public ProgramNode LearnSQL(DataTable inputTable, DataTable outputTable) {
             var spec = SpecFromStateOutput(inputTable, outputTable);
-            var programNode = LearnAll(spec, null, new Semantics.WitnessFunctions(Grammar));
+            var programNode = LearnAll(spec, QueryRanker, new Semantics.WitnessFunctions(Grammar));
             return programNode.First();
         }
 
         public ProgramNode[] LearnSQLAll(DataTable inputTable, DataTable outputTable)
         {
             var spec = SpecFromStateOutput(inputTable, outputTable);
-            return LearnAll(spec, null, new Semantics.WitnessFunctions(Grammar)).Take(10).ToArray();
+            return LearnAll(spec, null, new Semantics.WitnessFunctions(Grammar));
         }
 
         public DataTable Invoke(ProgramNode programNode, DataTable inputTable) {
