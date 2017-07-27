@@ -3,6 +3,7 @@ using System.Data;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualBasic.FileIO;
+using System.IO;
 
 namespace SNTSBackend.Parser
 {
@@ -10,7 +11,7 @@ namespace SNTSBackend.Parser
     { 
         public static DataTable Parse(String inputFile, int startNumber = 0, Boolean headerPresent = true)
         {
-            DataTable table = new DataTable();
+            DataTable table = new DataTable(Path.GetFileName(inputFile));
             List<DataColumn> cols = new List<DataColumn>();
             using (TextFieldParser parser = new TextFieldParser(inputFile))
             {

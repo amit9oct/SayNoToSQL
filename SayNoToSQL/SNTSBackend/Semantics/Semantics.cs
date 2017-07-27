@@ -11,7 +11,7 @@ namespace SNTSBackend.Semantics
 
         public static string[] LogicGen = { "AND", "OR" };
 
-        public static DataTable SelectWithoutWhere(DataColumn[] columnArray, DataTable[] tableArray) {
+        public static DataTable SelectWithoutWhere(DataColumn[] columnArray, DataTable[] tableArray, string[] tableNames = null) {
             var columnsInTable = tableArray.Select(t => t.Columns.Cast<DataColumn>().ToArray()).ToArray();
             var columnNamesDict = columnArray.ToDictionary(c => c.ColumnName, c => c);
             if(!(columnNamesDict.ContainsKey("PrimaryKey")))
@@ -49,7 +49,7 @@ namespace SNTSBackend.Semantics
             return displayTable;  
         }
 
-        public static DataTable SelectWithWhere(DataColumn[] columnArray, DataTable table)
+        public static DataTable SelectWithWhere(DataColumn[] columnArray, DataTable table, string[] tableNames = null)
         {
             var outputTable = SelectWithoutWhere(columnArray, new DataTable[] { table });
             return outputTable;

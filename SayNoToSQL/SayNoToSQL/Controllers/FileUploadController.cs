@@ -5,12 +5,26 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Web;
 using System.Web.Mvc;
 
 namespace SayNoToSQL.Controllers
 {
+    public class ProgramNodeSerializer {
+        public ProgramNode ProgramNode { get; set; }
+        public string HumanReadable { get; set; }
+        public int Idx { get; set;}
+        public string Encoded { get {
+                return SNTSBackend.Utils.Utils.Base64Encode(HumanReadable);
+            }
+        }
+
+        public string LargeFile { get; set; }
+    }
+
     public class FileUploadController : Controller {
+        public static Dictionary<string, ProgramNode> ProgramNodeDict = new Dictionary<string, ProgramNode>();
         //
         // GET: /FileUpload/
 
@@ -26,23 +40,44 @@ namespace SayNoToSQL.Controllers
         }
 
         [HttpPost]
-        public ActionResult Upload(HttpPostedFileBase input_file, HttpPostedFileBase output_file)
+        public ActionResult Upload(HttpPostedFileBase input_file, HttpPostedFileBase output_file, HttpPostedFileBase large_file)
         {
-            if (UploadFile(input_file) && UploadFile(output_file))
+            if (UploadFile(input_file) && UploadFile(output_file) && UploadFile(large_file))
             {
                 ViewBag.Message = "Files Uploaded Successfully!!";
                 ViewBag.InputFile = Path.GetFileName(input_file.FileName);
                 ViewBag.OutputFile = Path.GetFileName(output_file.FileName);
                 var inputTable = OpenFile(Path.GetFileName(input_file.FileName));
                 var outputTable = OpenFile(Path.GetFileName(output_file.FileName),inputTable);
+                var largeTable = OpenFile(Path.GetFileName(large_file.FileName));
                 try
                 {
-                    if (SNTSBackend.Learner.GrammarNotCompiled) {
+                    if (SNTSBackend.Learner.GrammarNotCompiled)
+                    {
                         Directory.SetCurrentDirectory(Server.MapPath("~/bin/"));
                         SNTSBackend.Learner.Instance.SetGrammar(Server.MapPath("~/App_Data/Grammar/SQL.grammar"));
                     }
                     var allProgramNodes = SNTSBackend.Learner.Instance.LearnSQLAll(inputTable, outputTable);
-                    ViewBag.AllProgramNodes = allProgramNodes;
+                    var prog = allProgramNodes.First();
+                    var ser = prog.PrintAST();
+                    var idx = 0;
+                    var serializedProgramNodes = new List<ProgramNodeSerializer>();
+                    foreach (var pNode in allProgramNodes) {
+                        serializedProgramNodes.Add(new ProgramNodeSerializer() {
+                            ProgramNode = pNode,
+                            HumanReadable = SNTSBackend.Learner.Instance.Query(pNode),
+                            Idx = idx,
+                            LargeFile = $"out_{idx}_{large_file.FileName}"
+                        });
+                        idx++;
+                    }
+                    
+                    foreach (var pNode in serializedProgramNodes)
+                    {
+                        var perQueryOutputTable = SNTSBackend.Learner.Instance.Invoke(pNode.ProgramNode, largeTable);
+                        SNTSBackend.Parser.DatatableToCSVWriter.Write(perQueryOutputTable, Path.Combine(Server.MapPath("~/Uploads/"), pNode.LargeFile));
+                    }
+                    ViewBag.AllProgramNodes = serializedProgramNodes;
                 }
                 catch(Exception e)
                 {
@@ -53,6 +88,13 @@ namespace SayNoToSQL.Controllers
             {
                 ViewBag.Message = "File upload failed!!";
             }
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult RunProgram(string filename)
+        {
+            ViewBag.InputFile = Path.GetFileName(filename);
             return View();
         }
 

@@ -11,12 +11,28 @@
     <table>
         <tr>
             <td>
+                <label>
+                    Enter the input file
+                </label>
                 <input type="file" name="input_file" placeholder="Enter the input file"/>
             </td>
         </tr>
         <tr>
             <td>
+                <label>
+                    Enter the output file
+                </label>
                 <input type="file" name="output_file" placeholder="Enter the output file"/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>
+                    Choose a large file to generated Run query
+                </label>
+            </td>
+            <td>
+                <input type="file" name="large_file" placeholder="Enter the large file" />
             </td>
         </tr>
         <tr>
@@ -35,10 +51,31 @@
 <div id="output-table-container"></div>
 
 <h3>SQL Queries</h3>
-@foreach(var programNode in ViewBag.AllProgramNodes)
+
+ 
+@foreach (var programNode in ViewBag.AllProgramNodes)
 {
-    <p>@programNode.ToString()</p>
+    using (@Html.BeginForm("RunProgram", "FileUpload", FormMethod.Post, new { @id = "form2", @enctype = "multipart/form-data", @target = "print_popup", @onsubmit = "window.open('about:blank','print_popup','width=1000,height=800');" }))
+    {
+     <!--   <form target="print_popup" method="POST" action="/RunProgram/RunProgram/" onsubmit="window.open('about:blank','print_popup','width=1000,height=800');">-->
+            <table>
+                <tr>
+
+                    <td>
+                        @programNode.HumanReadable
+                    </td>
+                    <td>
+                        <input type="hidden" name="filename" value="@programNode.LargeFile" />
+                    </td>
+                    <td>
+                        <input type="submit" id="bttn_Upload1" value="Run Query" />
+                    </td>
+                </tr>
+            </table>
+        <!--</form>-->
+    }
 }
+
 <script type="text/javascript">
     $(document).ready(function () {
         function format_link(link) {

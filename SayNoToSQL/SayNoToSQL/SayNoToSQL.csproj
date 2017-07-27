@@ -346,6 +346,7 @@
     <Compile Include="Controllers\FileUploadController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\RunProgramController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -426,6 +427,8 @@
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\FileUpload\Upload.cshtml" />
     <Content Include="Views\FileUpload\Index.cshtml" />
+    <Content Include="Views\RunProgram\RunProgram.cshtml" />
+    <Content Include="Views\FileUpload\RunProgram.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Uploads\" />

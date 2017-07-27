@@ -11,15 +11,15 @@ language SayNoToSql;
 
 @start DataTable sql := select;
 
-DataTable select := SelectWithoutWhere(columnArray,tableArray) 
-                  | SelectWithWhere(columnArray,condition);
+DataTable select := SelectWithoutWhere(columnArray, tableArray, tableNames) 
+                  | SelectWithWhere(columnArray, condition, tableNames);
 DataTable condition := cmpStatement 
-					| Logical(cmpStatement,@recurse[3] condition, logicSymbol); // combining two comparison statements 
+					| Logical(cmpStatement,@recurse[2] condition, logicSymbol); // combining two comparison statements 
 DataTable cmpStatement := Comparator(column, tableArray, cmpSymbol, constValue); // column.name [cmpSymbol] Const
 
 string cmpSymbol; 
 string logicSymbol;
-
+string[] tableNames;
 
 @input DataTable[] tableArray;
 DataColumn[] columnArray;
