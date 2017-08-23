@@ -240,6 +240,32 @@ namespace SNTSBackend.Tests
                 Utils.Utils.EqualColumns(outputLearnt, outputTable, "PrimaryKey");
             }
         }
+
+        [TestMethod]
+        public void DataTableCrossTest()
+        {
+            DataTable table1 = CSVToDatatableParser.Parse(@"TestCases\Synthesis\WithLogic-Input.csv");
+            DataTable table2 = CSVToDatatableParser.Parse(@"TestCases\Synthesis\WithLogic-Output.csv");
+            DataTable crossTable = Utils.Utils.CrossTable(table1, table2);
+            Debug.Assert(crossTable.Columns.Count == table1.Columns.Count + table2.Columns.Count);
+            Debug.Assert(crossTable.Rows.Count == table1.Rows.Count * table2.Rows.Count);
+            table1 = CSVToDatatableParser.Parse(@"TestCases\Synthesis\WithLogic-Input.csv");
+            table2 = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithoutWhere-Output.csv");
+            crossTable = Utils.Utils.CrossTable(table1, table2);
+            Debug.Assert(crossTable.Columns.Count == table1.Columns.Count + table2.Columns.Count);
+            Debug.Assert(crossTable.Rows.Count == table1.Rows.Count * table2.Rows.Count);
+        }
+
+        [TestMethod]
+        public void DataTableCrossMultiple()
+        {
+            DataTable table1 = CSVToDatatableParser.Parse(@"TestCases\Synthesis\WithLogic-Input.csv");
+            DataTable table2 = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithWhere-Output.csv");
+            DataTable table3 = CSVToDatatableParser.Parse(@"TestCases\Synthesis\SelectWithoutWhere-Output.csv");
+            var cross = Semantics.Semantics.CrossMultiplyTables(new[] { table1, table2, table3 });
+            Debug.Assert(cross.Columns.Count == table1.Columns.Count + table2.Columns.Count + table3.Columns.Count);
+            Debug.Assert(cross.Rows.Count == table1.Rows.Count * table2.Rows.Count * table3.Rows.Count);
+        }
     }
 
 }

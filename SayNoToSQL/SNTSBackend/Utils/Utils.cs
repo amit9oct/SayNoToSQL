@@ -15,6 +15,11 @@ namespace SNTSBackend.Utils
 {
     public class Utils
     {
+        /// <summary>
+        ///     To load the grammar file
+        /// </summary>
+        /// <param name="grammarFile">Location of the grammar file</param>
+        /// <returns></returns>
         public static Grammar LoadGrammar(string grammarFile)
         {
             var compilationResult = DSLCompiler.ParseGrammarFromFile(grammarFile);
@@ -41,6 +46,11 @@ namespace SNTSBackend.Utils
             Console.ForegroundColor = currentColor;
         }
 
+        /// <summary>
+        ///    Generates the powerset for the N rows in the table.
+        /// </summary>
+        /// <param name="table">The table whose powerset has to found</param>
+        /// <returns>Array of tables which represents the set</returns>
         public static DataTable[] GeneratePowerSet(DataTable table)
         {
             List<DataTable> outputTables = new List<DataTable>();
@@ -79,6 +89,7 @@ namespace SNTSBackend.Utils
                 return rows.CopyToDataTable();
             }
         }
+
         public static DataTable CreateOutputTableFromEnumerable(IEnumerable<DataRow> rows)
         {
             if (rows == null || rows.Count() == 0)
@@ -110,6 +121,72 @@ namespace SNTSBackend.Utils
         {
             var base64EncodedBytes = System.Convert.FromBase64String(base64EncodedData);
             return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
+        }
+
+
+        /// <summary>
+        ///     Function to take cross product of two Clonable objects
+        /// </summary>
+        /// <param name="objects">The objects whose cross has to be taken</param>
+        /// <param name="Cross">A callback method which can defines the crossing two objects</param>
+        /// <returns></returns>
+        public static object CartesianProduct(object[] objects, Func<object, object, object> Cross)
+        {
+            int crossDimension = objects.Length;
+            if (crossDimension == 1)
+            {
+                return objects.First();
+            }
+            var subObjects = objects.Skip(1).ToArray();
+            var subCartesianProduct = CartesianProduct(subObjects, Cross);
+            return Cross(objects.First(), subCartesianProduct);
+        }
+
+        public static DataTable CrossTable(DataTable table1, DataTable table2)
+        {
+            if(table1.TableName == table2.TableName)
+            {
+                table2.TableName += "I";
+            }
+
+            var product = new DataTable($"{table1.TableName}_X_{table2.TableName}");
+            var tupList = new List<NTuples>();
+            
+            foreach(var table in new[] { table1, table2})
+            {
+                foreach(DataColumn col in table.Columns)
+                {
+                    DataColumn newCol = new DataColumn($"{table.TableName}.{col.ColumnName}", col.DataType);
+                    product.Columns.Add(newCol);
+                }
+            }
+
+            foreach(DataRow table1Row in table1.Rows)
+            {
+                foreach(DataRow table2Row in table2.Rows)
+                {
+                    var tup = new NTuples(2);
+                    tup.AddToTuple(table1Row);
+                    tup.AddToTuple(table2Row);
+                    tupList.Add(tup);
+                }
+            }
+
+            foreach(var tup in tupList)
+            {
+                DataRow newRow = product.NewRow();
+                foreach (DataRow ele in tup.Tuple)
+                {
+                    foreach (DataColumn col in ele.Table.Columns)
+                    {
+                        newRow[$"{ele.Table.TableName}.{col.ColumnName}"] = ele[col.ColumnName];
+                    }
+
+                }
+                product.Rows.Add(newRow);
+            }
+
+            return product;
         }
 
     }

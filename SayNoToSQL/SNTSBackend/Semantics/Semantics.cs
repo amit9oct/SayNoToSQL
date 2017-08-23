@@ -1,5 +1,4 @@
 ﻿
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -10,6 +9,11 @@ namespace SNTSBackend.Semantics
         public static string[] CmpGen = { "<=", ">=", "==", "!=", "<", ">" };
 
         public static string[] LogicGen = { "AND", "OR" };
+
+        public static DataTable CrossMultiplyTables(DataTable[] tables) => 
+            (DataTable)Utils.Utils.CartesianProduct(tables.Cast<object>().ToArray(), 
+                                                    (object x, object y) => Utils.Utils.CrossTable((DataTable)x, (DataTable)y));
+
 
         public static DataTable SelectWithoutWhere(DataColumn[] columnArray, DataTable[] tableArray, string[] tableNames = null) {
             var columnsInTable = tableArray.Select(t => t.Columns.Cast<DataColumn>().ToArray()).ToArray();
