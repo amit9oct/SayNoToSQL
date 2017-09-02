@@ -225,6 +225,7 @@
     <Compile Include="Semantics\DataTableCustomComparator.cs" />
     <Compile Include="Semantics\Semantics.cs" />
     <Compile Include="Semantics\WitnessFunctions.cs" />
+    <Compile Include="Utils\NTuples.cs" />
     <Compile Include="Utils\Utils.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,4 @@
 ﻿
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -11,13 +10,14 @@ namespace SNTSBackend.Semantics
 
         public static string[] LogicGen = { "AND", "OR" };
 
+        public static DataTable CrossMultiplyTables(DataTable[] tables) => 
+            (DataTable)Utils.Utils.CartesianProduct(tables.Cast<object>().ToArray(), 
+                                                    (object x, object y) => Utils.Utils.CrossTable((DataTable)x, (DataTable)y));
+
+
         public static DataTable SelectWithoutWhere(DataColumn[] columnArray, DataTable[] tableArray, string[] tableNames = null) {
             var columnsInTable = tableArray.Select(t => t.Columns.Cast<DataColumn>().ToArray()).ToArray();
             var columnNamesDict = columnArray.ToDictionary(c => c.ColumnName, c => c);
-            if(!(columnNamesDict.ContainsKey("PrimaryKey")))
-            {
-                columnNamesDict.Add("PrimaryKey", tableArray[0].PrimaryKey[0]);
-            }
             
             var displayTable = new DataTable();
             var displayColumns = new List<DataColumn>();
@@ -33,11 +33,6 @@ namespace SNTSBackend.Semantics
                     }
                 }
             }
-
-
-            //Currently supports one table
-            //adding primary key to new table created
-            displayTable.PrimaryKey = new DataColumn[] { displayTable.Columns["PrimaryKey"] };
 
             foreach (DataRow row in tableArray[0].Rows) {
                 DataRow newRow = displayTable.NewRow();
