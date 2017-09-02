@@ -102,14 +102,159 @@ namespace SNTSBackend.Utils
             }
         }
 
-        public static bool EqualColumns(DataTable t1, DataTable t2, string columnName)
+        public static bool EqualColumns(DataTable table1, DataTable table2)
         {
-            var c1= t1.AsEnumerable().Select(r => r.Field< object >(columnName)).ToList();
-            c1.Sort();
-            var c2 = t2.AsEnumerable().Select(r => r.Field<object>(columnName)).ToList();
-            c2.Sort();
-            return c1.Equals(c2);
+            DataTable dt;
+            dt = GetDifferentRecords(table1, table2);
+
+            if (dt.Rows.Count == 0)
+                return true;
+            else
+                return false;
         }
+
+        //Found at http://canlu.blogspot.com/2009/05/how-to-compare-two-datatables-in-adonet.html
+        public static DataTable GetDifferentRecords(DataTable FirstDataTable, DataTable SecondDataTable)
+        {
+            //Create Empty Table     
+            DataTable ResultDataTable = new DataTable("ResultDataTable");
+
+            //use a Dataset to make use of a DataRelation object     
+            using (DataSet ds = new DataSet())
+            {
+                //Add tables     
+                ds.Tables.AddRange(new DataTable[] { FirstDataTable.Copy(), SecondDataTable.Copy() });
+
+                //Get Columns for DataRelation     
+                DataColumn[] firstColumns = new DataColumn[ds.Tables[0].Columns.Count];
+                for (int i = 0; i < firstColumns.Length; i++)
+                {
+                    firstColumns[i] = ds.Tables[0].Columns[i];
+                }
+
+                DataColumn[] secondColumns = new DataColumn[ds.Tables[1].Columns.Count];
+                for (int i = 0; i < secondColumns.Length; i++)
+                {
+                    secondColumns[i] = ds.Tables[1].Columns[i];
+                }
+
+                //Create DataRelation     
+                DataRelation r1 = new DataRelation(string.Empty, firstColumns, secondColumns, false);
+                ds.Relations.Add(r1);
+
+                DataRelation r2 = new DataRelation(string.Empty, secondColumns, firstColumns, false);
+                ds.Relations.Add(r2);
+
+                //Create columns for return table     
+                for (int i = 0; i < FirstDataTable.Columns.Count; i++)
+                {
+                    ResultDataTable.Columns.Add(FirstDataTable.Columns[i].ColumnName, FirstDataTable.Columns[i].DataType);
+                }
+
+                //If FirstDataTable Row not in SecondDataTable, Add to ResultDataTable.     
+                ResultDataTable.BeginLoadData();
+                foreach (DataRow parentrow in ds.Tables[0].Rows)
+                {
+                    DataRow[] childrows = parentrow.GetChildRows(r1);
+                    if (childrows == null || childrows.Length == 0)
+                        ResultDataTable.LoadDataRow(parentrow.ItemArray, true);
+                }
+
+                //If SecondDataTable Row not in FirstDataTable, Add to ResultDataTable.     
+                foreach (DataRow parentrow in ds.Tables[1].Rows)
+                {
+                    DataRow[] childrows = parentrow.GetChildRows(r2);
+                    if (childrows == null || childrows.Length == 0)
+                        ResultDataTable.LoadDataRow(parentrow.ItemArray, true);
+                }
+                ResultDataTable.EndLoadData();
+            }
+
+            return ResultDataTable;
+        }
+
+
+        public static DataTable[] GetAllPossibleTables(List<DataRow[]> completeRowsList, List<int> outputTableCount, DataTable inputTable)
+        {
+            var dataTableList = new List<DataTable>();
+            var idx = 0;
+            var preCrossDataRows = new List<DataRow[][]>();
+            foreach (var dataRows in completeRowsList)
+            {
+                var possibleCombinations = NChooseR(dataRows, outputTableCount[idx]).ToArray();
+                var possibleDataRows = new List<DataRow[]>();
+                foreach (var combination in possibleCombinations)
+                {
+                    var newDataRows = combination.Cast<DataRow>().ToArray();
+                    possibleDataRows.Add(newDataRows);
+                }
+                preCrossDataRows.Add(possibleDataRows.ToArray());
+                idx++;
+            }
+            var crossRows = (NTuples[])CartesianProduct(preCrossDataRows.ToArray(), (object x, object y) => CrossDataRows((DataRow[][])x, (NTuples[])y));
+            foreach(var tup in crossRows)
+            {
+                var newTable = inputTable.Clone();
+                foreach(DataRow[] rowsPossible in tup.Tuple)
+                {
+                    foreach(var row in rowsPossible)
+                        newTable.ImportRow(row);
+                }
+                dataTableList.Add(newTable);
+            }
+            return dataTableList.ToArray();
+        }
+
+        public static IEnumerable<HashSet<object>> NChooseR(IEnumerable<object> inputSet, int r)
+        {
+            int n = inputSet.Count();
+            //Find all nCr subsets of the given set inputSet
+            var answer = new HashSet<object>();
+            if(r == 0)
+            {
+                yield return answer;
+            }
+            int idx = 0;
+            foreach (var element in inputSet)
+            {
+                foreach (var combi in NChooseR(inputSet.Skip(idx+1), r - 1))
+                {
+                    combi.Add(element);
+                    yield return combi;
+                }
+                idx++;
+            }
+        }
+
+        public static NTuples[] CrossDataRows(DataRow[][] possibleRows, NTuples[] possibleRowsTuple = null)
+        {
+            if (possibleRowsTuple == null)
+            {
+                return possibleRows.Select(r => { var tup = new NTuples(1); tup.AddToTuple(r); return tup; }).ToArray();
+            }
+            else
+            {
+                var newPossibleRowTuple = new List<NTuples>();
+
+                foreach(var rows in possibleRows)
+                {
+                    foreach (var rowTuple in possibleRowsTuple)
+                    {
+                        var newRowTuple = new NTuples(rowTuple.TupleSize+1);
+                        foreach (var tup in rowTuple.Tuple)
+                            newRowTuple.AddToTuple(tup);
+                        newRowTuple.AddToTuple(rows);
+                        newPossibleRowTuple.Add(newRowTuple);
+                    }
+                }
+                return newPossibleRowTuple.ToArray();
+            }
+        }
+
+        //public static List<DataRow>[] CrossDataRow(DataRow[] rows1, DataRow[] rows2) {
+        //    var cross = new List<DataRow>[rows1.Length * rows2.Length];
+            
+        //}
 
         public static string Base64Encode(string plainText)
         {
@@ -135,15 +280,17 @@ namespace SNTSBackend.Utils
             int crossDimension = objects.Length;
             if (crossDimension == 1)
             {
-                return objects.First();
+                return Cross(objects.First(), null);
             }
             var subObjects = objects.Skip(1).ToArray();
             var subCartesianProduct = CartesianProduct(subObjects, Cross);
             return Cross(objects.First(), subCartesianProduct);
         }
 
-        public static DataTable CrossTable(DataTable table1, DataTable table2)
+        public static DataTable CrossTable(DataTable table1, DataTable table2 = null)
         {
+            if (table2 == null)
+                return table1;
             if(table1.TableName == table2.TableName)
             {
                 table2.TableName += "I";

@@ -281,6 +281,21 @@
     <EmbeddedResource Include="TestCases\Synthesis\SelectWithWhere\SWW-NotEqual-Input.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="TestCases\Synthesis\PrimaryKeyFail-Input.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestCases\Synthesis\PrimaryKeyFail-Output.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestCases\Synthesis\DataRowCross3.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestCases\Synthesis\DataRowCross1.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestCases\Synthesis\DataRowCross2.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SNTSBackend\SNTSBackend.csproj">

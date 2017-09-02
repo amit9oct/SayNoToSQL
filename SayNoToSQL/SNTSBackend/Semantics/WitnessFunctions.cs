@@ -59,24 +59,29 @@ namespace SNTSBackend.Semantics
 
 
         [WitnessFunction(nameof(Semantics.SelectWithWhere), 1)]
-            internal DisjunctiveExamplesSpec WitnessSelectWithWhereCondition(GrammarRule rule, ExampleSpec spec) {
-                var ppExamples = new Dictionary<State, IEnumerable<object>>();
-                foreach(State input in spec.ProvidedInputs) {
-                    var inputTable = ((DataTable[])input[rule.Grammar.InputSymbol])[0];
-                    var outputTable = (DataTable)spec.Examples[input];
-                    var conditionTable = inputTable.Clone();
-                    var allPossibleSolutions = new List<object>();
-                    foreach (DataRow row in outputTable.Rows) {
-                        //TODO: Make it a Primary Key
-                        var completeRow = inputTable.Select("PrimaryKey=" + row["PrimaryKey"]).First();
-                        conditionTable.ImportRow(completeRow);
-                    }
-                    allPossibleSolutions.Add(conditionTable);
-                    ppExamples[input] = allPossibleSolutions;
+        internal DisjunctiveExamplesSpec WitnessSelectWithWhereCondition(GrammarRule rule, ExampleSpec spec) {
+            var ppExamples = new Dictionary<State, IEnumerable<object>>();
+            foreach(State input in spec.ProvidedInputs) {
+                var inputTable = ((DataTable[])input[rule.Grammar.InputSymbol])[0];
+                var outputTable = (DataTable)spec.Examples[input];
+                var allPossibleSolutions = new List<object>();
+                var selectQuery = outputTable.PrimaryKey.Select(c => c.ColumnName).ToArray();
+                var completeRowsList = new List<DataRow[]>();
+                DataView view = new DataView(outputTable);
+                List<int> outputCountList = new List<int>();
+                DataTable distinctValues = view.ToTable(true,selectQuery);
+                foreach (DataRow row in distinctValues.Rows) {
+                    var query = string.Join(" AND ", selectQuery.Select(c => (inputTable.Columns[c].DataType == typeof(string))? $"{c}='{row[c]}'":$"{c}={row[c]}"));
+                    completeRowsList.Add(inputTable.Select(query));
+                    outputCountList.Add(outputTable.Select(query).Count());
                 }
-                //Complete the rows
-                return DisjunctiveExamplesSpec.From(ppExamples);
+                var conditionTables = Utils.Utils.GetAllPossibleTables(completeRowsList, outputCountList, inputTable);
+                allPossibleSolutions.AddRange(conditionTables);
+                ppExamples[input] = allPossibleSolutions;
             }
+            //Complete the rows
+            return DisjunctiveExamplesSpec.From(ppExamples);
+        }
 
             [WitnessFunction(nameof(Semantics.SelectWithWhere), 0, DependsOnParameters = new[] { 1 })]
             internal DisjunctiveExamplesSpec WitnessSelectWithWhereColumnArray(GrammarRule rule, DisjunctiveExamplesSpec spec, ExampleSpec conditionSpec) {

@@ -32,8 +32,6 @@ namespace SNTSBackend.Parser
                     firstLine = parser.ReadFields(); //read first line of values - to get length
                     headers = Enumerable.Range(0, firstLine.Length).Select(n => n.ToString()).ToArray();
                 }
-
-                cols.Add(new DataColumn("PrimaryKey", typeof(int)));
                 
                 for (int i = 0; i < firstLine.Length; i++)
                 {
@@ -41,7 +39,9 @@ namespace SNTSBackend.Parser
                     cols.Add(new DataColumn(headers[i], type));
                 }
                 table.Columns.AddRange(cols.ToArray());
-                table.PrimaryKey = new DataColumn[] { table.Columns["PrimaryKey"]};
+                var primaryKeyCols = new DataColumn[table.Columns.Count];
+                table.Columns.CopyTo(primaryKeyCols,0);
+                table.PrimaryKey = primaryKeyCols;
                 DataRow row = table.NewRow();
                 table.Rows.Add(CreateRow(row, rowCount, headers, firstLine));
                 while (!parser.EndOfData)
@@ -118,7 +118,6 @@ namespace SNTSBackend.Parser
 
         private static DataRow CreateRow(DataRow row, int rowCount, String[] headers, String[] fields)
         {
-            row["PrimaryKey"] = rowCount;
             for(int i = 0; i < headers.Length; i++)
             {
                 row[headers[i]] = fields[i];
