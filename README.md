@@ -6,7 +6,7 @@ VSTS Build Status:
 
 Contributors
 ----
-- Amitayush Thakur (amit9oct@gmail.com)
+- Amitayush Thakur
 - Krishnan Govindraj
 - Sharon Mathews
 - Jhanavi Seth
