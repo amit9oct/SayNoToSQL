@@ -9,5 +9,5 @@ Contributors
 - Amitayush Thakur
 - Krishnan Govindraj
 - Sharon Mathews
-- Jhanavi Seth
+- Jhanavi Sheth
 - Pranav Pal Lekhi
